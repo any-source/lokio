@@ -1,6 +1,6 @@
 {
 	"name": "lokio",
-	"version": "1.0.2",
+	"version": "1.0.3",
 	"author": {
 		"name": "wahyu agus arifin",
 		"email": "itpohgero@gmail.com",
@@ -14,6 +14,7 @@
 	},
 	"module": "index.ts",
 	"type": "module",
+	"files": ["data/", "cmd/", "bin/index.ts"],
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
 		"@types/bun": "^1.2.2"

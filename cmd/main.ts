@@ -1,4 +1,6 @@
 import { Command } from "commander";
+import { CONTEXT_KEY } from "./configs/context-key";
+import { clearContext, setContext } from "./context/main";
 import { TEXT } from "./environment/text";
 import { useReadConfig } from "./hooks/use_config";
 import { ProgramCreate } from "./programs/create";
@@ -12,9 +14,13 @@ export const run = async () => {
 		const { exist, data } = useReadConfig();
 		await ProgramInit(program);
 		if (!exist) {
+			clearContext();
 			await ProgramCreate(program);
 		}
 		if (exist) {
+			setContext(CONTEXT_KEY.CONFIGS.NAME, data.name);
+			setContext(CONTEXT_KEY.CONFIGS.PACKAGE, data.package);
+			setContext(CONTEXT_KEY.CONFIGS.DIR, data.dir);
 			await ProgramMake(program);
 		}
 

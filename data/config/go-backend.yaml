@@ -1,0 +1,12 @@
+# Lokio Configuration File
+# Author: Lokio
+# Github: https://github.com/any-source/lokio
+# Documentation: https://lokio.dev
+
+name: go-backend
+package: your-package
+
+# Directory
+dir:
+  # client
+  go-controller: internal/delivery/http/controller

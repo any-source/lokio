@@ -19,5 +19,22 @@ clean:
 	@rm -rf public/bin/lokio public/bin/lokio.exe
 	@echo "✅ Clean completed!"
 
-start:
+# Lokio init
+lokio:
 	@public/bin/lokio
+
+# Check version
+lokio-v:
+	@public/bin/lokio -v
+
+# Information
+lokio-i:
+	@public/bin/lokio i
+
+# Create new project
+lokio-c:
+	@public/bin/lokio c
+
+# Make file
+lokio-m:
+	@public/bin/lokio m

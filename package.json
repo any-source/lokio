@@ -8,6 +8,9 @@
   },
   "module": "index.ts",
   "type": "module",
+  "scripts": {
+    "start": "public/bin/lokio"
+  },
   "devDependencies": {
     "@types/bun": "^1.2.2"
   },

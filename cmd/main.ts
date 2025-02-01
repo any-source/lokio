@@ -1,6 +1,7 @@
 import { Command } from "commander";
 import { ProgramInit } from "./programs/init";
 import { ProgramInfo } from "./programs/info";
+import { TEXT } from "./environment/text";
 
 export const run = async () => {
     try {        
@@ -9,6 +10,6 @@ export const run = async () => {
         await ProgramInfo(program);
         program.parse(process.argv);
     } catch (error) {
-        console.error("❌ Gagal membaca file info.md:", error);
+        console.error(`${TEXT.PROGRAM.ERROR_RUN}:`, error);
     }
 };

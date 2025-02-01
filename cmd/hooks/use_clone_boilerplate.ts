@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { filePath } from "@/configs/file-path";
+import { getEmbeddedContent } from "@/configs/file-path";
 import {
 	installDependenciesGolang,
 	processFilesGolang,
@@ -62,9 +62,7 @@ class TemplateManager {
 	private async copyConfig(): Promise<void> {
 		const { tmpl, projectName } = this.options;
 		const destPath = path.join(this.paths.projectDir, ".lokio.yaml");
-		const configPath = filePath.config(`${tmpl}.yaml`);
-		const file = Bun.file(configPath);
-		const yamlContent = await file.text();
+		const yamlContent = getEmbeddedContent(`${tmpl}.yaml`);
 		try {
 			const updatedContent = yamlContent.replace(
 				/package:\s*.+/,
@@ -74,9 +72,7 @@ class TemplateManager {
 			console.log(chalk.green("✓ Configuration file copied successfully"));
 		} catch (error) {
 			if ((error as NodeJS.ErrnoException).code === "ENOENT") {
-				console.warn(
-					chalk.yellow(`⚠️ Configuration file not found: ${configPath}`),
-				);
+				console.warn(chalk.yellow(`⚠️ Configuration file not found: ${error}`));
 				return;
 			}
 			throw new Error(

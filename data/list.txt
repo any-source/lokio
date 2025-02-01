@@ -1,0 +1,7 @@
+https://sh.lokio.dev/data/info.md
+https://sh.lokio.dev/data/config/astro-frontend.yaml
+https://sh.lokio.dev/data/config/go-backend.yaml
+https://sh.lokio.dev/data/config/hono-backend.yaml
+https://sh.lokio.dev/data/config/kt-mobile-compose-mvvm.yaml
+https://sh.lokio.dev/data/config/next-frontend.yaml
+https://sh.lokio.dev/data/config/next-monolith.yaml

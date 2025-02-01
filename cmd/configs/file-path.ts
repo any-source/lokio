@@ -19,8 +19,14 @@ class FilePath {
         return this.create("data", "config", filename);
     }
 
-    ejs(filename: string): string {
-        return this.create("data", "ejs.t", filename);
+    ejs_golang(filename: string): string {
+        return this.create("data", "ejs.t", "golang", filename);
+    }
+    ejs_kotlin(filename: string): string {
+        return this.create("data", "ejs.t", "kotlin", filename);
+    }
+    ejs_typescript(filename: string): string {
+        return this.create("data", "ejs.t", "typescript", filename);
     }
 
     custom(directory: string, filename: string): string {

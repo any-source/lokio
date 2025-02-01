@@ -38,3 +38,7 @@ lokio-c:
 # Make file
 lokio-m:
 	@public/bin/lokio m
+
+# Format
+format:
+	@bun run format

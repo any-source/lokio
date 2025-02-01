@@ -1,8 +1,14 @@
 import readline from "node:readline";
-import { createLogUpdate } from "log-update";
 import { action } from "@/utils/util-action";
-import { random, randomBetween, sleep, strip, useAscii } from "@/utils/util-use";
+import {
+	random,
+	randomBetween,
+	sleep,
+	strip,
+	useAscii,
+} from "@/utils/util-use";
 import color from "chalk";
+import { createLogUpdate } from "log-update";
 
 type Message = string | Promise<string>;
 export const say = async (

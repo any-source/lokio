@@ -1,6 +1,6 @@
-import { ENV } from "@/environment/main";
 import fs from "node:fs";
 import path from "node:path";
+import { ENV } from "@/environment/main";
 import YAML from "yaml";
 
 type ConfigDir = {
@@ -11,10 +11,10 @@ type ConfigDir = {
 	screen?: string;
 	layout?: string;
 	feature?: string;
-	controller?: string
-	middleware?: string
-	service?: string
-	schema?: string
+	controller?: string;
+	middleware?: string;
+	service?: string;
+	schema?: string;
 };
 
 type ConfigData = {
@@ -72,15 +72,19 @@ export const useReadConfig = (): UseReadConfigType => {
 };
 
 /**
- * @param config 
- * @param key 
- * @param value 
+ * @param config
+ * @param key
+ * @param value
  * @example
  * if (config.exist) {
  * 		addDirectory(config.data, "utils", "src/utils");
  * }
  */
-export const addDirectory = (config: ConfigData, key: string, value: string): ConfigData => {
+export const addDirectory = (
+	config: ConfigData,
+	key: string,
+	value: string,
+): ConfigData => {
 	return {
 		...config,
 		dir: {
@@ -91,15 +95,18 @@ export const addDirectory = (config: ConfigData, key: string, value: string): Co
 };
 
 /**
- * @param config 
- * @param key 
+ * @param config
+ * @param key
  * @example
  * if (config.exist) {
  * 		removeDirectory(config.data, "hook");
  * }
  */
 
-export const removeDirectory = (config: ConfigData, key: string): ConfigData => {
+export const removeDirectory = (
+	config: ConfigData,
+	key: string,
+): ConfigData => {
 	const updatedDir = { ...config.dir };
 	delete updatedDir[key as keyof ConfigDir];
 	return {

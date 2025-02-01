@@ -1,23 +1,30 @@
 {
-  "name": "lokio",
-  "version": "0.0.1",
-  "author": {
-    "name": "wahyu agus arifin",
-    "email": "itpohgero@gmail.com",
-    "url": "https://github.com/itpohgero"
-  },
-  "module": "index.ts",
-  "type": "module",
-  "devDependencies": {
-    "@types/bun": "^1.2.2"
-  },
-  "peerDependencies": {
-    "typescript": "^5.0.0"
-  },
-  "dependencies": {
-    "chalk": "^5.4.1",
-    "commander": "^13.1.0",
-    "log-update": "^6.1.0",
-    "yaml": "^2.7.0"
-  }
+	"name": "lokio",
+	"version": "0.0.1",
+	"author": {
+		"name": "wahyu agus arifin",
+		"email": "itpohgero@gmail.com",
+		"url": "https://github.com/itpohgero"
+	},
+	"scripts": {
+		"format": "bun run biome:format && bun run biome:check && bun run biome:lint",
+		"biome:format": "bunx biome format --write .",
+		"biome:check": "bunx biome check --write .",
+		"biome:lint": "bunx biome lint --write ."
+	},
+	"module": "index.ts",
+	"type": "module",
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4",
+		"@types/bun": "^1.2.2"
+	},
+	"peerDependencies": {
+		"typescript": "^5.0.0"
+	},
+	"dependencies": {
+		"chalk": "^5.4.1",
+		"commander": "^13.1.0",
+		"log-update": "^6.1.0",
+		"yaml": "^2.7.0"
+	}
 }

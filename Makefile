@@ -2,10 +2,12 @@
 
 push:
 	@echo "🚀 Running push.sh..."
+	@chmod +x ./shell/push.sh
 	@./shell/push.sh
 
 fork:
 	@echo "🚀 Running fork.sh..."
+	@chmod +x ./shell/fork.sh
 	@./shell/fork.sh
 
 build:

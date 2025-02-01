@@ -10,7 +10,7 @@ run_command() {
 }
 
 # Run lint, check, and format
-run_command "bun run biome"
+run_command "bun run format"
 
 # Stage changes (excluding specific files, like `.env`, if needed)
 run_command "git add ."

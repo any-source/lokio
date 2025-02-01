@@ -1,9 +1,10 @@
 import { CommandChooseBoilerplate } from "@/command/choose-boilerplate";
+import { CommandInstallDependencies } from "@/command/install-dependencies";
 import { CommandProjectName } from "@/command/project-name";
-import { CONTEXT_KEY } from "@/configs/context-key";
-import { getContext } from "@/context/main";
 import { TEXT } from "@/environment/text";
-import { log } from "@/utils/util-use";
+import copyTemplate, {
+	type SupportedLanguage,
+} from "@/hooks/use_clone_boilerplate";
 import type { Command } from "commander";
 
 export const ProgramCreate = async (program: Command) => {
@@ -14,7 +15,19 @@ export const ProgramCreate = async (program: Command) => {
 		.action(async () => {
 			const pkg_name = await CommandProjectName();
 			const tmp = await CommandChooseBoilerplate();
+			const dep = await CommandInstallDependencies();
+
+			const lang = tmp.lang as SupportedLanguage;
+
 			console.log("Direct project name:", pkg_name);
 			console.log("Direct project name:", JSON.stringify(tmp));
+			console.log("Direct project name:", JSON.stringify(dep));
+
+			await copyTemplate({
+				install: dep,
+				projectName: pkg_name,
+				tmpl: tmp.value,
+				lang,
+			});
 		});
 };

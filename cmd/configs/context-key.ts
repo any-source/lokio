@@ -6,5 +6,7 @@ export const CONTEXT_KEY = {
 	},
 	COMMAND: {
 		PACKAGE_NAME: "command_package_name",
+		BOILERPLATE: "command_boilerplate",
+		INSTALL_DEPENDENCY: "command_install_dependency",
 	},
 };

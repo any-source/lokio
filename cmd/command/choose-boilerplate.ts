@@ -2,6 +2,8 @@ import {
 	BOILERPLATE_OPTIONS,
 	type BOILERPLATE_OPTIONS_TYPE,
 } from "@/configs/boilerplate";
+import { CONTEXT_KEY } from "@/configs/context-key";
+import { setContext } from "@/context/main";
 import { TEXT } from "@/environment/text";
 import { info } from "@/interfaces/info";
 import { label } from "@/interfaces/label";
@@ -30,9 +32,13 @@ export const CommandChooseBoilerplate =
 			"Yey!",
 			`You selected ${color.green(selectedTemplate.label)} for your new project.`,
 		);
+		setContext<BOILERPLATE_OPTIONS_TYPE>(
+			CONTEXT_KEY.COMMAND.BOILERPLATE,
+			selectedTemplate,
+		);
 		return selectedTemplate;
 	};
-const SelectBoilerplate = async (
+export const SelectBoilerplate = async (
 	options: BOILERPLATE_OPTIONS_TYPE[],
 	message = "Pick your tech!",
 ): Promise<BOILERPLATE_OPTIONS_TYPE | undefined> => {

@@ -1,3 +1,0 @@
-https://sh.lokio.dev/data/file1.txt
-https://sh.lokio.dev/data/file2.txt
-https://sh.lokio.dev/data/file3.md

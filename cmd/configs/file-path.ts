@@ -14,8 +14,21 @@ export const filePaths = {
 		".local",
 		"share",
 		"lokio",
-		"config",
 		"astro-frontend.yaml",
+	),
+	"go-backend.yaml": join(
+		process.env.HOME || "",
+		".local",
+		"share",
+		"lokio",
+		"go-backend.yaml",
+	),
+	"hono-backend.yaml": join(
+		process.env.HOME || "",
+		".local",
+		"share",
+		"lokio",
+		"hono-backend.yaml",
 	),
 };
 const EMBEDDED_FILES: { [key: string]: string } = {};

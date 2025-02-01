@@ -40,7 +40,6 @@ do_user_install() {
     # Membaca file daftar dan mengunduh setiap file
     while read -r file_url; do
         # Mengunduh setiap file berdasarkan URL yang ada di file daftar
-        echo "Downloading $file_url..."
         curl -# -o "$DATA_DEST/$(basename $file_url)" "$file_url"
     done < "$DATA_DEST/file_list.txt"
 

@@ -1,0 +1,26 @@
+{
+  "name": "lokio",
+  "version": "0.0.1",
+  "author": {
+    "name": "wahyu agus arifin",
+    "email": "itpohgero@gmail.com",
+    "url": "https://github.com/itpohgero"
+  },
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "^1.2.2"
+  },
+  "scripts": {
+    "build": "bun build bin/main.ts --outfile=public/bin/lokio --compile && bun build bin/main.ts --outfile=public/bin/lokio.exe --compile",
+    "start": "public/bin/lokio"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "chalk": "^5.4.1",
+    "commander": "^13.1.0",
+    "log-update": "^6.1.0"
+  }
+}

@@ -2,7 +2,13 @@ import { join } from "node:path";
 import { file } from "bun";
 
 const filePaths = {
-	"info.md": "data/info.md",
+	"info.md": join(
+		process.env.HOME || "",
+		".local",
+		"share",
+		"lokio",
+		"info.md",
+	),
 };
 
 const EMBEDDED_FILES: { [key: string]: string } = {};

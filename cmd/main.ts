@@ -1,6 +1,5 @@
 import { Command } from "commander";
 import { CONTEXT_KEY } from "./configs/context-key";
-import { FilePath } from "./configs/file-path";
 import { clearContext, setContext } from "./context/main";
 import { TEXT } from "./environment/text";
 import { useReadConfig } from "./hooks/use_config";
@@ -11,10 +10,6 @@ import { ProgramMake } from "./programs/make";
 
 export const run = async () => {
 	try {
-		const filePath = new FilePath(__dirname);
-		filePath.addDirectory("data");
-		filePath.saveAsBinary("output.bin");
-
 		const program = new Command();
 		const { exist, data } = useReadConfig();
 		await ProgramInit(program);

@@ -1,21 +1,7 @@
 # Makefile
-.PHONY: build bundle clean
-
-# Bundle data files first
-bundle:
-	@echo "📦 Bundling data files..."
-	@bun run cmd/_.ts
-	@echo "✅ Bundle completed!"
-
-# Clean previous builds
-clean:
-	@echo "🧹 Cleaning previous builds..."
-	@rm -rf public/bin
-	@mkdir -p public/bin
-	@echo "✅ Clean completed!"
 
 # Main build process
-build: clean bundle
+build:
 	@echo "🚀 Building project..."
 	@bun build bin/main.ts --outfile=public/bin/lokio --compile
 	@bun build bin/main.ts --outfile=public/bin/lokio.exe --compile

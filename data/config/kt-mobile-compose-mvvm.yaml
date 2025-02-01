@@ -1,0 +1,12 @@
+# Lokio Configuration File
+# Author: Lokio
+# Github: https://github.com/any-source/lokio
+# Documentation: https://lokio.dev
+
+name: kt-mobile-compose-mvvm
+package: your-package
+
+# Directory
+dir:
+  # client
+  feature: "src/main/java/{package}/{domain}/presentation/feature"

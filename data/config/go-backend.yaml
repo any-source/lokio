@@ -9,4 +9,4 @@ package: your-package
 # Directory
 dir:
   # client
-  go-controller: internal/delivery/http/controller
+  controller: internal/delivery/http/controller

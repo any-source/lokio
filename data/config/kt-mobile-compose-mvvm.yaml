@@ -9,4 +9,4 @@ package: your-package
 # Directory
 dir:
   # client
-  kt-feature: "src/main/java/{package}/{domain}/presentation/feature"
+  feature: "src/main/java/{package}/{domain}/presentation/feature"

@@ -8,9 +8,6 @@
   },
   "module": "index.ts",
   "type": "module",
-  "scripts": {
-    "start": "public/bin/lokio"
-  },
   "devDependencies": {
     "@types/bun": "^1.2.2"
   },
@@ -20,6 +17,7 @@
   "dependencies": {
     "chalk": "^5.4.1",
     "commander": "^13.1.0",
-    "log-update": "^6.1.0"
+    "log-update": "^6.1.0",
+    "yaml": "^2.7.0"
   }
 }

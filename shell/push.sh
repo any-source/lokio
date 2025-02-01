@@ -22,4 +22,4 @@ read -r -p "Enter commit message: " msg
 run_command "git commit -m \"$msg\""
 
 # Push changes
-run_command "git push"
+# run_command "git push"

@@ -11,10 +11,6 @@
   "devDependencies": {
     "@types/bun": "^1.2.2"
   },
-  "scripts": {
-    "build": "bun build bin/main.ts --outfile=public/bin/lokio --compile && bun build bin/main.ts --outfile=public/bin/lokio.exe --compile",
-    "start": "public/bin/lokio"
-  },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },

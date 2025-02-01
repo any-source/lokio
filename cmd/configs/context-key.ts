@@ -4,4 +4,7 @@ export const CONTEXT_KEY = {
 		PACKAGE: "configs_package",
 		DIR: "configs_dir",
 	},
+	COMMAND: {
+		PACKAGE_NAME: "command_package_name",
+	},
 };

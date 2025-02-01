@@ -4,5 +4,6 @@ export const TEXT = {
 		VERSION_DESCRIPTION: "Output the current version",
 		MAKE_DESCRIPTION: "Create a pattern file for project",
 		CREATE_DESCRIPTION: "Create a new project",
+		CANCELED: "Operation cancelled.",
 	},
 };

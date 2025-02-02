@@ -1,0 +1,24 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main  # Sesuaikan dengan branch yang ingin Anda trigger
+  pull_request:
+    branches:
+      - main  # Sesuaikan dengan branch yang ingin Anda trigger
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Anda bisa mengganti dengan runner lain jika diperlukan
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up environment
+        run: |
+          sudo apt-get update
+
+      - name: Run make build
+        run: make build  # Jalankan perintah make build

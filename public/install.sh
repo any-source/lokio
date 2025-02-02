@@ -2,9 +2,9 @@
 
 # URL binary untuk berbagai platform
 declare -A BINARY_URLS
-BINARY_URLS["Linux-x86_64"]="http://103.127.96.116:9000/bin/linux"
-BINARY_URLS["Darwin-arm64"]="http://103.127.96.116:9000/bin/macos-chip"
-BINARY_URLS["Darwin-x86_64"]="http://103.127.96.116:9000/bin/macos-intel"
+BINARY_URLS["Linux-x86_64"]="https://sh.lokio.dev/bin/linux"
+BINARY_URLS["Darwin-arm64"]="https://sh.lokio.dev/bin/macos-chip"
+BINARY_URLS["Darwin-x86_64"]="https://sh.lokio.dev/bin/macos-intel"
 
 # Warna untuk output
 GREEN='\033[0;32m'

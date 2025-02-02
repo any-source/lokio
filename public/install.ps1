@@ -1,157 +1,116 @@
-# Base URL untuk binary
-$BASE_URL = "http://103.127.96.116:9000/install"
+# Configuration
+$binaryUrl = "http://103.127.96.116:9000/bin/windows.exe"
+$installDir = "$env:ProgramFiles\Lokio"
+$maxRetries = 3
+$retryCount = 0
 
-# URL binary untuk Windows
-$BINARY_URLS = @{
-    "Windows-AMD64" = "$BASE_URL/windows.exe"
-}
-
-# Fungsi untuk logging dengan warna
-function Write-ColorOutput {
-    param(
-        [Parameter(Mandatory = $true)]
-        [string]$Message,
-        
-        [Parameter(Mandatory = $false)]
-        [string]$Color = "White"
+function Test-Command {
+    param (
+        [string]$Command
     )
-    
-    $prevColor = $host.UI.RawUI.ForegroundColor
-    $host.UI.RawUI.ForegroundColor = $Color
-    Write-Output $Message
-    $host.UI.RawUI.ForegroundColor = $prevColor
-}
-
-function Write-Info {
-    param([string]$Message)
-    Write-ColorOutput "[INFO] $Message" "Green"
-}
-
-function Write-Error {
-    param([string]$Message)
-    Write-ColorOutput "[ERROR] $Message" "Red"
-}
-
-function Write-Warning {
-    param([string]$Message)
-    Write-ColorOutput "[WARNING] $Message" "Yellow"
-}
-
-# Fungsi untuk cek koneksi ke server
-function Test-ServerConnection {
     try {
-        $response = Invoke-WebRequest -Uri $BASE_URL -Method Head -UseBasicParsing
-        return $response.StatusCode -eq 200
+        Get-Command $Command -ErrorAction Stop
+        return $true
     }
     catch {
         return $false
     }
 }
 
-# Fungsi untuk mendapatkan arsitektur sistem
-function Get-SystemArchitecture {
-    if ([Environment]::Is64BitOperatingSystem) {
-        return "AMD64"
-    }
-    else {
-        return "x86"
-    }
-}
-
-# Fungsi untuk menambahkan ke PATH
 function Add-ToPath {
-    param(
+    param (
         [string]$Directory
     )
-    
-    $currentPath = [Environment]::GetEnvironmentVariable("Path", "User")
+    $currentPath = [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::Machine)
     if ($currentPath -notlike "*$Directory*") {
         $newPath = "$currentPath;$Directory"
-        [Environment]::SetEnvironmentVariable("Path", $newPath, "User")
-        $env:Path = "$env:Path;$Directory"
-        Write-Info "Added $Directory to PATH"
+        [Environment]::SetEnvironmentVariable("Path", $newPath, [EnvironmentVariableTarget]::Machine)
+        $env:Path = $newPath
+        Write-Host "Added $Directory to PATH" -ForegroundColor Green
+        return $true
     }
+    return $false
 }
 
-# Fungsi utama instalasi
-function Install-Lokio {
-    # Deteksi platform
-    $os = "Windows"
-    $arch = Get-SystemArchitecture
-    $platformKey = "$os-$arch"
-    
-    Write-Info "Detected platform: $platformKey"
-    
-    # Verifikasi platform didukung
-    if (-not $BINARY_URLS.ContainsKey($platformKey)) {
-        Write-Error "Unsupported platform: $platformKey"
-        return $false
+try {
+    # Create installation directory
+    if (-Not (Test-Path $installDir)) {
+        Write-Host "Creating installation directory..." -ForegroundColor Yellow
+        New-Item -ItemType Directory -Path $installDir -Force | Out-Null
     }
+
+    # Configure TLS
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+    # Download with retry logic
+    Write-Host "Downloading Lokio..." -ForegroundColor Yellow
+    $ProgressPreference = 'SilentlyContinue'
     
-    # Cek koneksi ke server
-    if (-not (Test-ServerConnection)) {
-        Write-Error "Cannot connect to download server. Please check your internet connection."
-        return $false
-    }
-    
-    # Buat direktori instalasi
-    $installDir = "$env:LOCALAPPDATA\Lokio"
-    $binaryPath = "$installDir\lokio.exe"
-    
-    try {
-        # Buat direktori jika belum ada
-        if (-not (Test-Path $installDir)) {
-            New-Item -ItemType Directory -Path $installDir -Force | Out-Null
-            Write-Info "Created installation directory: $installDir"
-        }
-        
-        # Download binary
-        Write-Info "Downloading Lokio..."
-        $binaryUrl = $BINARY_URLS[$platformKey]
-        Invoke-WebRequest -Uri $binaryUrl -OutFile $binaryPath -UseBasicParsing
-        
-        # Verifikasi file terdownload
-        if (-not (Test-Path $binaryPath)) {
-            Write-Error "Failed to download binary"
-            return $false
-        }
-        
-        # Tambahkan ke PATH
-        Add-ToPath $installDir
-        
-        # Verifikasi instalasi
+    while ($retryCount -lt $maxRetries) {
         try {
-            $null = Get-Command "lokio.exe" -ErrorAction Stop
-            Write-Info "Lokio has been successfully installed!"
-            Write-Info "You can now use 'lokio' from any terminal"
-            Write-Info "Note: You may need to restart your terminal to use the 'lokio' command"
-            return $true
+            $webClient = New-Object System.Net.WebClient
+            $webClient.DownloadFile($binaryUrl, "$installDir\lokio.exe")
+            Write-Host "Download completed successfully!" -ForegroundColor Green
+            break
         }
         catch {
-            Write-Error "Installation verification failed. 'lokio' command not found in PATH"
-            return $false
+            $retryCount++
+            if ($retryCount -eq $maxRetries) {
+                throw "Download failed after $maxRetries attempts. Error: $_"
+            }
+            Write-Host "Download attempt $retryCount failed. Retrying in 5 seconds..." -ForegroundColor Yellow
+            Start-Sleep -Seconds 5
         }
     }
-    catch {
-        Write-Error "Installation failed: $_"
-        return $false
-    }
-}
 
-# Main execution
-try {
-    # Cek jika PowerShell dijalankan sebagai administrator
-    $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-    
-    if (-not $isAdmin) {
-        Write-Warning "Running without administrator privileges. Installation will be done for current user only."
+    # Verify downloaded file
+    if (-Not (Test-Path "$installDir\lokio.exe")) {
+        throw "Installation failed - executable not found"
     }
-    
-    if (-not (Install-Lokio)) {
-        exit 1
+
+    # Add to PATH
+    Write-Host "Updating system PATH..." -ForegroundColor Yellow
+    Add-ToPath -Directory $installDir
+
+    # Refresh current session PATH
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
+
+    # Verify installation
+    Write-Host "Verifying installation..." -ForegroundColor Yellow
+    if (Test-Path "$installDir\lokio.exe") {
+        Write-Host "Installation file verified!" -ForegroundColor Green
+    } else {
+        throw "Installation verification failed - executable not found"
     }
+
+    # Test command availability
+    Write-Host "Testing command availability..." -ForegroundColor Yellow
+    if (Test-Command -Command "lokio") {
+        Write-Host "Lokio command is available!" -ForegroundColor Green
+    } else {
+        Write-Host "WARNING: Lokio command not immediately available. Please restart your terminal." -ForegroundColor Yellow
+    }
+
+    # Final verification and instructions
+    Write-Host "`nInstallation completed!" -ForegroundColor Green
+    Write-Host @"
+
+Next steps:
+1. Close and reopen your PowerShell terminal
+2. Run 'lokio -v' to verify the installation
+3. If the command is still not found, try running: & '$installDir\lokio.exe' -v
+
+Installation Directory: $installDir
+"@ -ForegroundColor Cyan
+
 }
 catch {
-    Write-Error "Unexpected error occurred: $_"
+    Write-Host "`nInstallation failed: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "`nTroubleshooting steps:" -ForegroundColor Yellow
+    Write-Host "1. Ensure you're running PowerShell as Administrator"
+    Write-Host "2. Check your internet connection"
+    Write-Host "3. Verify if the directory '$installDir' is accessible"
+    Write-Host "4. Check if your antivirus is blocking the download"
+    Write-Host "5. Try running the installation script again"
     exit 1
 }

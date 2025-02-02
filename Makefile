@@ -23,8 +23,9 @@ build-linux:
 
 # Build for macOS
 build-mac:
+	@bun build --compile bin/main.ts --outfile=$(OUT_DIR)/macos	
 	@bun build --compile --target=bun-darwin-x64 bin/main.ts --outfile=$(OUT_DIR)/macos-intel	
-	@bun build --compile --target=bun-darwin-arm64 bin/main.ts --outfile=$(OUT_DIR)/macos-arm64
+	@bun build --compile --target=bun-darwin-arm64 bin/main.ts --outfile=$(OUT_DIR)/macos-chip
 
 # Clean build artifacts
 clean:

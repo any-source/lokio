@@ -6,7 +6,7 @@ set -e
 ARCH=$(uname -m)
 
 if [[ "$ARCH" == "arm64" ]]; then
-    FILE_URL="https://lokio.dev/install/macos-chip"
+    FILE_URL="https://lokio.dev/install/macos"
 else
     echo "Arsitektur tidak didukung!"
     exit 1

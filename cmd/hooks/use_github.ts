@@ -38,7 +38,7 @@ export async function readFileFromGithub(
 	githubUrl: string,
 	filePath: string,
 ): Promise<string> {
-	const tempDir = path.resolve(process.cwd(), '.temp-download'); // Use resolve to ensure absolute path
+	const tempDir = path.resolve(process.cwd(), ".temp-download"); // Use resolve to ensure absolute path
 	try {
 		// Ensure temp directory exists
 		await fs.mkdir(tempDir, { recursive: true });
@@ -51,7 +51,7 @@ export async function readFileFromGithub(
 
 		// Use resolve to construct an absolute path to avoid relative path issues
 		const fullPath = path.resolve(tempDir, filePath);
-		const content = await fs.readFile(fullPath, 'utf-8');
+		const content = await fs.readFile(fullPath, "utf-8");
 
 		// Cleanup the temporary directory after reading the file
 		await fs.rm(tempDir, { recursive: true, force: true });
@@ -64,7 +64,7 @@ export async function readFileFromGithub(
 			),
 		);
 		// Clean up the temp directory even if an error occurs
-		await fs.rm(tempDir, { recursive: true, force: true }).catch(() => { });
+		await fs.rm(tempDir, { recursive: true, force: true }).catch(() => {});
 		throw error;
 	}
 }

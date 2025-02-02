@@ -1,32 +1,141 @@
-# URL binary
-$binaryUrl = "https://sh.lokio.dev/bin/lokio.exe"
-
-# Lokasi instalasi
-$installDir = "$env:ProgramFiles\Lokio"
-
-# Buat direktori instalasi jika belum ada
-if (-Not (Test-Path $installDir)) {
-    Write-Host "Membuat direktori instalasi..."
-    New-Item -ItemType Directory -Path $installDir
+# URLs and paths configuration
+$CONFIG = @{
+    BinaryUrl = "https://sh.lokio.dev/bin/lokio.exe"
+    ConfigListUrl = "https://sh.lokio.dev/data/list.yaml"
+    InstallDir = "$env:ProgramFiles\Lokio"
+    DataDir = "$env:LOCALAPPDATA\Lokio"
 }
 
-# Unduh binary dengan progress bar
-Write-Host "Installing..."
-$ProgressPreference = 'SilentlyContinue'  # Nonaktifkan progress bawaan Invoke-WebRequest
-Invoke-WebRequest -Uri $binaryUrl -OutFile "$installDir\lokio.exe" -UseBasicParsing
+# Modern UI helper functions
+function Write-ColorText {
+    param (
+        [string]$Text,
+        [string]$Color = "White",
+        [switch]$NoNewline
+    )
+    $params = @{
+        ForegroundColor = $Color
+        NoNewline = $NoNewline.IsPresent
+    }
+    Write-Host $Text @params
+}
 
-# Berikan izin eksekusi (tidak diperlukan di Windows, karena .exe sudah executable)
-Write-Host "Give permission to execute..."
-# Tidak ada tindakan khusus yang diperlukan di Windows untuk .exe
+function Write-Step {
+    param ([string]$Message)
+    Write-ColorText "→ " -Color Cyan -NoNewline
+    Write-ColorText $Message
+}
 
-# Tambahkan direktori instalasi ke PATH
-Write-Host "Add to PATH..."
-$env:Path += ";$installDir"
-[Environment]::SetEnvironmentVariable("Path", $env:Path, [EnvironmentVariableTarget]::Machine)
+function Write-Success {
+    param ([string]$Message)
+    Write-ColorText "✓ " -Color Green -NoNewline
+    Write-ColorText $Message
+}
 
-# Verifikasi instalasi
-if (Get-Command lokio -ErrorAction SilentlyContinue) {
-    Write-Host "`nCongratulations! Let's run 'lokio'."
-} else {
-    Write-Host "`nInstallation failed. Please try again."
+function Write-Error {
+    param ([string]$Message)
+    Write-ColorText "✗ " -Color Red -NoNewline
+    Write-ColorText $Message -Color Red
+}
+
+function Show-Progress {
+    param (
+        [int]$Current,
+        [int]$Total,
+        [string]$Activity
+    )
+    $percentage = [math]::Round(($Current / $Total) * 100)
+    $width = 50
+    $completed = [math]::Round(($width * $Current) / $Total)
+    $remaining = $width - $completed
+    
+    $progressBar = "[" + 
+        ("█" * $completed) +
+        ("░" * $remaining) +
+        "] ${percentage}%"
+    
+    Write-Host "`r$Activity $progressBar" -NoNewline
+}
+
+function Install-LokioFiles {
+    try {
+        # Create installation directories
+        Write-Step "Creating installation directories..."
+        New-Item -ItemType Directory -Force -Path $CONFIG.InstallDir | Out-Null
+        New-Item -ItemType Directory -Force -Path $CONFIG.DataDir | Out-Null
+
+        # Download and install binary
+        Write-Step "Downloading Lokio binary..."
+        $ProgressPreference = 'SilentlyContinue'
+        Invoke-WebRequest -Uri $CONFIG.BinaryUrl -OutFile "$($CONFIG.InstallDir)\lokio.exe" -UseBasicParsing
+
+        # Download configuration files
+        Write-Step "Downloading configuration files..."
+        $configList = Invoke-WebRequest -Uri $CONFIG.ConfigListUrl -UseBasicParsing | 
+            ConvertFrom-Yaml
+
+        $totalFiles = $configList.Count
+        $currentFile = 0
+
+        foreach ($item in $configList) {
+            $fileName = Split-Path $item.url -Leaf
+            $outPath = Join-Path $CONFIG.DataDir $fileName
+            
+            Invoke-WebRequest -Uri $item.url -OutFile $outPath -UseBasicParsing
+            $currentFile++
+            Show-Progress -Current $currentFile -Total $totalFiles -Activity "Downloading files"
+        }
+        Write-Host "`n"
+
+        # Add to PATH
+        Write-Step "Updating system PATH..."
+        $currentPath = [Environment]::GetEnvironmentVariable("Path", [EnvironmentVariableTarget]::Machine)
+        if ($currentPath -notlike "*$($CONFIG.InstallDir)*") {
+            $newPath = "$currentPath;$($CONFIG.InstallDir)"
+            [Environment]::SetEnvironmentVariable(
+                "Path", 
+                $newPath, 
+                [EnvironmentVariableTarget]::Machine
+            )
+            $env:Path = $newPath
+        }
+
+        return $true
+    }
+    catch {
+        Write-Error "Installation failed: $_"
+        return $false
+    }
+}
+
+function Test-AdminPrivileges {
+    $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
+    $principal = New-Object Security.Principal.WindowsPrincipal($identity)
+    return $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+}
+
+# Main installation process
+Clear-Host
+Write-ColorText "🚀 Lokio Installer for Windows" -Color Cyan
+Write-Host "`n"
+
+if (-not (Test-AdminPrivileges)) {
+    Write-Error "This script requires administrator privileges. Please run PowerShell as Administrator."
+    exit 1
+}
+
+Write-Host "Installation will use these locations:"
+Write-Host "- Program files: $($CONFIG.InstallDir)"
+Write-Host "- Data files: $($CONFIG.DataDir)"
+Write-Host "`n"
+
+$install = Install-LokioFiles
+if ($install) {
+    Write-Success "Lokio has been successfully installed!"
+    Write-Host "`nYou can now use 'lokio' from any new PowerShell window"
+    Write-Host "Note: You may need to restart your PowerShell session for PATH changes to take effect"
+}
+else {
+    Write-Error "Installation failed. Please check the error messages above and try again."
+    exit 1
 }

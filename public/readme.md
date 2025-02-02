@@ -1,1 +1,0 @@
-# This is public path will be accessed by the browser

@@ -1,76 +1,111 @@
 #!/bin/bash
 
-# URL untuk mendapatkan daftar file
-FILE_LIST_URL="https://sh.lokio.dev/data/list.txt"
+# URLs and paths
+FILE_LIST_URL="https://sh.lokio.dev/data/list.yaml"
 BINARY_URL="https://sh.lokio.dev/bin/lokio"
 DATA_DEST="$HOME/.local/share/lokio"
 
-# Warna untuk output
-GREEN='\033[0;32m'
-RED='\033[0;31m'
-NC='\033[0m'
+# Modern styling
+bold=$(tput bold)
+normal=$(tput sgr0)
+blue=$(tput setaf 4)
+green=$(tput setaf 2)
+red=$(tput setaf 1)
 
-# Fungsi untuk mencoba instalasi sistem
-try_system_install() {
+# Progress bar function
+progress_bar() {
+    local progress=$1
+    local total=$2
+    local width=50
+    local percentage=$((progress * 100 / total))
+    local completed=$((width * progress / total))
+    local remaining=$((width - completed))
+    
+    printf "\r[${blue}"
+    printf "%${completed}s" | tr ' ' '█'
+    printf "${normal}"
+    printf "%${remaining}s" | tr ' ' '░'
+    printf "] ${percentage}%%"
+}
+
+# Spinner animation
+spinner() {
+    local pid=$1
+    local delay=0.1
+    local spinstr='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏'
+    while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
+        local temp=${spinstr#?}
+        printf "\r${blue}[%c]${normal} " "$spinstr"
+        local spinstr=$temp${spinstr%"$temp"}
+        sleep $delay
+    done
+    printf "\r   \r"
+}
+
+echo "${bold}🚀 Installing Lokio...${normal}\n"
+
+# Try system installation first
+install_system() {
+    echo "${blue}→${normal} Attempting system installation..."
     if sudo -n true 2>/dev/null; then
-        # Sudo tersedia tanpa password
         sudo mkdir -p "/usr/local/bin"
-        echo "Installing to system directory..."
-        sudo curl -# -o "/usr/local/bin/lokio" "$BINARY_URL"
-        sudo chmod +x "/usr/local/bin/lokio"
+        (sudo curl -s -o "/usr/local/bin/lokio" "$BINARY_URL" && \
+         sudo chmod +x "/usr/local/bin/lokio") &
+        spinner $!
         return 0
     fi
     return 1
 }
 
-# Fungsi untuk instalasi user
-do_user_install() {
-    echo "Installing to user directory..."
-    mkdir -p "$HOME/.local/bin"
-    curl -# -o "$HOME/.local/bin/lokio" "$BINARY_URL"
-    chmod +x "$HOME/.local/bin/lokio"
+# User installation
+install_user() {
+    echo "${blue}→${normal} Installing in user directory..."
+    mkdir -p "$HOME/.local/bin" "$DATA_DEST"
+    
+    # Download binary
+    (curl -s -o "$HOME/.local/bin/lokio" "$BINARY_URL" && \
+     chmod +x "$HOME/.local/bin/lokio") &
+    spinner $!
 
-    # Membuat direktori untuk menyimpan data
-    mkdir -p "$DATA_DEST"
+    # Download and parse YAML file list
+    echo "\n${blue}→${normal} Downloading configuration files..."
+    curl -s -o "$DATA_DEST/list.yaml" "$FILE_LIST_URL"
+    
+    # Count total files for progress bar
+    total_files=$(grep "^- url:" "$DATA_DEST/list.yaml" | wc -l)
+    current_file=0
 
-    # Mengunduh daftar file
-    echo "Downloading file list..."
-    curl -# -o "$DATA_DEST/file_list.txt" "$FILE_LIST_URL"
+    # Download each file
+    while IFS=': ' read -r _ url; do
+        filename=$(basename "$url")
+        curl -s -o "$DATA_DEST/$filename" "$url"
+        ((current_file++))
+        progress_bar $current_file $total_files
+    done < <(grep "^- url:" "$DATA_DEST/list.yaml")
+    echo # New line after progress bar
 
-    # Membaca file daftar dan mengunduh setiap file
-    while read -r file_url; do
-        # Mengunduh setiap file berdasarkan URL yang ada di file daftar
-        curl -# -o "$DATA_DEST/$(basename $file_url)" "$file_url"
-    done < "$DATA_DEST/file_list.txt"
-
-    # Menambahkan ke PATH jika belum ada
+    # Update PATH if needed
     if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
-        echo 'export PATH="$HOME/.local/bin:$PATH"' >>"$HOME/.bashrc"
+        echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"
         export PATH="$HOME/.local/bin:$PATH"
     fi
 }
 
-# Main installation
-echo "Installing Lokio..."
-
-# Coba instalasi sistem dulu
-if try_system_install; then
+# Main installation process
+if install_system; then
     INSTALL_TYPE="system"
 else
-    # Jika gagal, lakukan instalasi user
-    do_user_install
+    install_user
     INSTALL_TYPE="user"
 fi
 
-# Verifikasi instalasi
+# Verify installation
 if command -v lokio &>/dev/null; then
-    echo -e "\n${GREEN}Congratulations! Lokio has been installed successfully!${NC}"
-    echo -e "Installation type: $INSTALL_TYPE"
-    if [ "$INSTALL_TYPE" = "user" ]; then
-        echo -e "Note: You may need to restart your terminal or run 'source ~/.bashrc'"
-    fi
-    echo -e "Let's run 'lokio'"
+    echo "\n${green}✓ Lokio installed successfully!${normal}"
+    echo "Installation type: ${bold}$INSTALL_TYPE${normal}"
+    [ "$INSTALL_TYPE" = "user" ] && echo "Note: You may need to restart your terminal or run 'source ~/.bashrc'"
+    echo "\nRun ${bold}lokio${normal} to get started"
 else
-    echo -e "\n${RED}Installation failed. Please try again.${NC}"
+    echo "\n${red}✗ Installation failed. Please try again.${normal}"
     exit 1
 fi

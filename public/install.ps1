@@ -1,9 +1,12 @@
-# URLs and paths configuration
+# Read and parse config
+$configJson = Get-Content -Path "config.json" -Raw | ConvertFrom-Json
+
+# Set configuration
 $CONFIG = @{
-    BinaryUrl = "https://sh.lokio.dev/bin/lokio.exe"
-    ConfigListUrl = "https://sh.lokio.dev/data/list.yaml"
-    InstallDir = "$env:ProgramFiles\Lokio"
-    DataDir = "$env:LOCALAPPDATA\Lokio"
+    BinaryUrl = $configJson.binary.windows
+    ConfigUrls = $configJson.configFiles
+    InstallDir = $ExecutionContext.InvokeCommand.ExpandString($configJson.paths.windows.installDir)
+    DataDir = $ExecutionContext.InvokeCommand.ExpandString($configJson.paths.windows.dataDir)
 }
 
 # Modern UI helper functions
@@ -71,17 +74,14 @@ function Install-LokioFiles {
 
         # Download configuration files
         Write-Step "Downloading configuration files..."
-        $configList = Invoke-WebRequest -Uri $CONFIG.ConfigListUrl -UseBasicParsing | 
-            ConvertFrom-Yaml
-
-        $totalFiles = $configList.Count
+        $totalFiles = $CONFIG.ConfigUrls.Count
         $currentFile = 0
 
-        foreach ($item in $configList) {
-            $fileName = Split-Path $item.url -Leaf
+        foreach ($url in $CONFIG.ConfigUrls) {
+            $fileName = Split-Path $url -Leaf
             $outPath = Join-Path $CONFIG.DataDir $fileName
             
-            Invoke-WebRequest -Uri $item.url -OutFile $outPath -UseBasicParsing
+            Invoke-WebRequest -Uri $url -OutFile $outPath -UseBasicParsing
             $currentFile++
             Show-Progress -Current $currentFile -Total $totalFiles -Activity "Downloading files"
         }

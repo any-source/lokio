@@ -1,0 +1,38 @@
+{
+	"binary": {
+		"windows": "https://sh.lokio.dev/bin/lokio.exe",
+		"macos": "https://sh.lokio.dev/bin/lokio",
+		"linux": "https://sh.lokio.dev/bin/lokio"
+	},
+	"configFiles": [
+		"https://sh.lokio.dev/data/info.md",
+		"https://sh.lokio.dev/data/config/astro-frontend.yaml",
+		"https://sh.lokio.dev/data/config/go-backend.yaml",
+		"https://sh.lokio.dev/data/config/hono-backend.yaml",
+		"https://sh.lokio.dev/data/config/kt-mobile-compose-mvvm.yaml",
+		"https://sh.lokio.dev/data/config/next-frontend.yaml",
+		"https://sh.lokio.dev/data/config/next-monolith.yaml",
+		"https://sh.lokio.dev/data/ejs.t/golang/controller.ejs.t",
+		"https://sh.lokio.dev/data/ejs.t/kotlin/screen.ejs.t",
+		"https://sh.lokio.dev/data/ejs.t/typescript/call.ejs.t",
+		"https://sh.lokio.dev/data/ejs.t/typescript/component.ejs.t",
+		"https://sh.lokio.dev/data/ejs.t/typescript/controller.ejs.t",
+		"https://sh.lokio.dev/data/ejs.t/typescript/hook.ejs.t",
+		"https://sh.lokio.dev/data/ejs.t/typescript/layout.ejs.t",
+		"https://sh.lokio.dev/data/ejs.t/typescript/middleware.ejs.t",
+		"https://sh.lokio.dev/data/ejs.t/typescript/route.ejs.t",
+		"https://sh.lokio.dev/data/ejs.t/typescript/schema.ejs.t",
+		"https://sh.lokio.dev/data/ejs.t/typescript/screen.ejs.t",
+		"https://sh.lokio.dev/data/ejs.t/typescript/service.ejs.t"
+	],
+	"paths": {
+		"windows": {
+			"installDir": "%ProgramFiles%\\Lokio",
+			"dataDir": "%LOCALAPPDATA%\\Lokio"
+		},
+		"linux": {
+			"installDir": "/usr/local/bin",
+			"dataDir": "$HOME/.local/share/lokio"
+		}
+	}
+}

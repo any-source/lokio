@@ -1,9 +1,28 @@
 #!/bin/bash
 
-# URLs and paths
-FILE_LIST_URL="https://sh.lokio.dev/data/list.yaml"
-BINARY_URL="https://sh.lokio.dev/bin/lokio"
-DATA_DEST="$HOME/.local/share/lokio"
+# Load config
+if ! command -v jq &>/dev/null; then
+    echo "jq is required. Please install it first:"
+    echo "Ubuntu/Debian: sudo apt-get install jq"
+    echo "Fedora: sudo dnf install jq"
+    echo "macOS: brew install jq"
+    exit 1
+fi
+
+# Read config file
+CONFIG_FILE="config.json"
+if [ ! -f "$CONFIG_FILE" ]; then
+    echo "Error: config.json not found"
+    exit 1
+fi
+
+# Parse config
+BINARY_URL=$(jq -r '.binary.linux' "$CONFIG_FILE")
+DATA_DEST=$(jq -r '.paths.linux.dataDir' "$CONFIG_FILE" | envsubst)
+INSTALL_DIR=$(jq -r '.paths.linux.installDir' "$CONFIG_FILE" | envsubst)
+
+# Get config files array
+mapfile -t CONFIG_FILES < <(jq -r '.configFiles[]' "$CONFIG_FILE")
 
 # Modern styling
 bold=$(tput bold)
@@ -48,9 +67,9 @@ echo "${bold}🚀 Installing Lokio...${normal}\n"
 install_system() {
     echo "${blue}→${normal} Attempting system installation..."
     if sudo -n true 2>/dev/null; then
-        sudo mkdir -p "/usr/local/bin"
-        (sudo curl -s -o "/usr/local/bin/lokio" "$BINARY_URL" && \
-         sudo chmod +x "/usr/local/bin/lokio") &
+        sudo mkdir -p "$INSTALL_DIR"
+        (sudo curl -s -o "$INSTALL_DIR/lokio" "$BINARY_URL" && \
+         sudo chmod +x "$INSTALL_DIR/lokio") &
         spinner $!
         return 0
     fi
@@ -67,21 +86,18 @@ install_user() {
      chmod +x "$HOME/.local/bin/lokio") &
     spinner $!
 
-    # Download and parse YAML file list
-    echo "\n${blue}→${normal} Downloading configuration files..."
-    curl -s -o "$DATA_DEST/list.yaml" "$FILE_LIST_URL"
-    
-    # Count total files for progress bar
-    total_files=$(grep "^- url:" "$DATA_DEST/list.yaml" | wc -l)
+    # Download configuration files
+    echo -e "\n${blue}→${normal} Downloading configuration files..."
+    total_files=${#CONFIG_FILES[@]}
     current_file=0
 
     # Download each file
-    while IFS=': ' read -r _ url; do
+    for url in "${CONFIG_FILES[@]}"; do
         filename=$(basename "$url")
         curl -s -o "$DATA_DEST/$filename" "$url"
         ((current_file++))
         progress_bar $current_file $total_files
-    done < <(grep "^- url:" "$DATA_DEST/list.yaml")
+    done
     echo # New line after progress bar
 
     # Update PATH if needed
@@ -101,11 +117,11 @@ fi
 
 # Verify installation
 if command -v lokio &>/dev/null; then
-    echo "\n${green}✓ Lokio installed successfully!${normal}"
+    echo -e "\n${green}✓ Lokio installed successfully!${normal}"
     echo "Installation type: ${bold}$INSTALL_TYPE${normal}"
     [ "$INSTALL_TYPE" = "user" ] && echo "Note: You may need to restart your terminal or run 'source ~/.bashrc'"
-    echo "\nRun ${bold}lokio${normal} to get started"
+    echo -e "\nRun ${bold}lokio${normal} to get started"
 else
-    echo "\n${red}✗ Installation failed. Please try again.${normal}"
+    echo -e "\n${red}✗ Installation failed. Please try again.${normal}"
     exit 1
 fi

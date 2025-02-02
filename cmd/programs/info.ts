@@ -1,5 +1,7 @@
 import { getEmbeddedContent } from "@/configs/file-path";
 import { ENV } from "@/environment/main";
+import { Github } from "@/github/readfile";
+import { readFileFromGithub } from "@/hooks/use_github";
 import { say } from "@/interfaces/say";
 import { log } from "@/utils/util-use";
 import chalk from "chalk";
@@ -11,7 +13,7 @@ export const ProgramInfo = async (program: Command) => {
 		.alias("i")
 		.description(`Show information about the ${ENV.NAME}`)
 		.action(async () => {
-			const content = getEmbeddedContent("info.md");
+			const data = await Github();
 			await say(
 				[
 					["Welcome", "to", ENV.VERSION],
@@ -19,7 +21,7 @@ export const ProgramInfo = async (program: Command) => {
 				] as string[],
 				{ clear: false, hat: "", tie: "" },
 			);
-			log(`${content}\n`);
+			log(`${data.GITHUB_MARKDOWN_INFO}\n`);
 			log(`Author : ${chalk.green(ENV.AUTHOR)}`);
 		});
 };

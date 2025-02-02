@@ -14,7 +14,7 @@
 	},
 	"module": "index.ts",
 	"type": "module",
-	"files": ["data/", "cmd/", "bin/index.ts"],
+	"files": ["cmd/", "bin/index.ts"],
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
 		"@types/bun": "^1.2.2"

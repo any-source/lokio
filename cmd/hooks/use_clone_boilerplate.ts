@@ -1,6 +1,8 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { getEmbeddedContent } from "@/configs/file-path";
+import { ENV } from "@/environment/main";
+import { Github } from "@/github/readfile";
 import {
 	installDependenciesGolang,
 	processFilesGolang,
@@ -9,8 +11,8 @@ import {
 	installDependenciesTypescript,
 	processFilesTypescript,
 } from "@/services/install/typescript";
-import { downloadTemplate } from "@bluwy/giget-core";
 import chalk from "chalk";
+import { getDirFromGithub } from "./use_github";
 
 export type SupportedLanguage = "ts" | "go" | "kt";
 
@@ -62,8 +64,9 @@ class TemplateManager {
 	private async copyConfig(): Promise<void> {
 		const { tmpl, projectName } = this.options;
 		const destPath = path.join(this.paths.projectDir, ".lokio.yaml");
-		const yamlContent = getEmbeddedContent(`${tmpl}.yaml`);
 		try {
+			const { CONFIG_YAML } = await Github();
+			const yamlContent = await CONFIG_YAML(tmpl);
 			const updatedContent = yamlContent.replace(
 				/package:\s*.+/,
 				`package: ${projectName}`,
@@ -102,7 +105,6 @@ class TemplateManager {
 
 	public async execute(): Promise<void> {
 		const { tempDir, projectDir, templatePath } = this.paths;
-
 		try {
 			// Initial setup
 			console.log(chalk.blue("🚀 Starting template setup..."));
@@ -110,13 +112,7 @@ class TemplateManager {
 			await this.ensureDirectory(projectDir);
 
 			// Download and copy template
-			await downloadTemplate(
-				"https://github.com/any-source/examples/tarball/main",
-				{
-					dir: tempDir,
-					force: true,
-				},
-			);
+			await getDirFromGithub(ENV.GUTHUB.LOKIO_TEMPLATE, tempDir);
 			await fs.cp(templatePath, projectDir, { recursive: true });
 			console.log(chalk.green("✓ Template files copied"));
 

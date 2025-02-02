@@ -42,28 +42,33 @@ write_error() {
 }
 
 install_lokio_binary() {
-    try {
-        # Create installation directory
-        write_step "Creating installation directory..."
-        mkdir -p "$INSTALL_DIR"
-
-        # Download and install binary
-        write_step "Downloading Lokio binary..."
-        curl -L "$BINARY_URL" -o "$INSTALL_DIR/lokio"
-        chmod +x "$INSTALL_DIR/lokio"  # Make the binary executable
-
-        # Add to PATH (if not already added)
-        write_step "Updating system PATH..."
-        if [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
-            echo "export PATH=\"$INSTALL_DIR:\$PATH\"" >> "$HOME/.bashrc"
-            source "$HOME/.bashrc"
-        fi
-
-        return 0
-    } catch {
-        write_error "Installation failed: $1"
+    # Create installation directory
+    write_step "Creating installation directory..."
+    if ! mkdir -p "$INSTALL_DIR"; then
+        write_error "Failed to create installation directory"
         return 1
-    }
+    fi
+
+    # Download and install binary
+    write_step "Downloading Lokio binary..."
+    if ! curl -L "$BINARY_URL" -o "$INSTALL_DIR/lokio"; then
+        write_error "Failed to download binary"
+        return 1
+    fi
+
+    if ! chmod +x "$INSTALL_DIR/lokio"; then
+        write_error "Failed to make binary executable"
+        return 1
+    fi
+
+    # Add to PATH (if not already added)
+    write_step "Updating system PATH..."
+    if [[ ":$PATH:" != *":$INSTALL_DIR:"* ]]; then
+        echo "export PATH=\"$INSTALL_DIR:\$PATH\"" >> "$HOME/.bashrc"
+        source "$HOME/.bashrc"
+    fi
+
+    return 0
 }
 
 test_admin_privileges() {

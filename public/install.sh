@@ -1,28 +1,9 @@
 #!/bin/bash
 
-# Load config
-if ! command -v jq &>/dev/null; then
-    echo "jq is required. Please install it first:"
-    echo "Ubuntu/Debian: sudo apt-get install jq"
-    echo "Fedora: sudo dnf install jq"
-    echo "macOS: brew install jq"
-    exit 1
-fi
-
-# Read config file
-CONFIG_FILE="config.json"
-if [ ! -f "$CONFIG_FILE" ]; then
-    echo "Error: config.json not found"
-    exit 1
-fi
-
-# Parse config
-BINARY_URL=$(jq -r '.binary.linux' "$CONFIG_FILE")
-DATA_DEST=$(jq -r '.paths.linux.dataDir' "$CONFIG_FILE" | envsubst)
-INSTALL_DIR=$(jq -r '.paths.linux.installDir' "$CONFIG_FILE" | envsubst)
-
-# Get config files array
-mapfile -t CONFIG_FILES < <(jq -r '.configFiles[]' "$CONFIG_FILE")
+# URLs and paths
+FILE_LIST_URL="https://sh.lokio.dev/data/list.yaml"
+BINARY_URL="https://sh.lokio.dev/bin/lokio"
+DATA_DEST="$HOME/.local/share/lokio"
 
 # Modern styling
 bold=$(tput bold)
@@ -39,7 +20,7 @@ progress_bar() {
     local percentage=$((progress * 100 / total))
     local completed=$((width * progress / total))
     local remaining=$((width - completed))
-    
+
     printf "\r[${blue}"
     printf "%${completed}s" | tr ' ' '█'
     printf "${normal}"
@@ -54,23 +35,34 @@ spinner() {
     local spinstr='⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏'
     while [ "$(ps a | awk '{print $1}' | grep $pid)" ]; do
         local temp=${spinstr#?}
-        printf "\r${blue}[%c]${normal} " "$spinstr"
+        printf "\r${blue}[%c]${normal} %s" "$spinstr" "$2"
         local spinstr=$temp${spinstr%"$temp"}
         sleep $delay
     done
-    printf "\r   \r"
+    printf "\r\033[K"
 }
 
 echo "${bold}🚀 Installing Lokio...${normal}\n"
+
+# Check for dependencies
+check_dependencies() {
+    local dependencies=("curl" "grep" "basename")
+    for dep in "${dependencies[@]}"; do
+        if ! command -v "$dep" &>/dev/null; then
+            echo "${red}✗ Dependency '$dep' is not installed. Please install it and try again.${normal}"
+            exit 1
+        fi
+    done
+}
 
 # Try system installation first
 install_system() {
     echo "${blue}→${normal} Attempting system installation..."
     if sudo -n true 2>/dev/null; then
-        sudo mkdir -p "$INSTALL_DIR"
-        (sudo curl -s -o "$INSTALL_DIR/lokio" "$BINARY_URL" && \
-         sudo chmod +x "$INSTALL_DIR/lokio") &
-        spinner $!
+        sudo mkdir -p "/usr/local/bin"
+        (sudo curl -s -o "/usr/local/bin/lokio" "$BINARY_URL" &&
+            sudo chmod +x "/usr/local/bin/lokio") &
+        spinner $! "Downloading Lokio binary..."
         return 0
     fi
     return 1
@@ -80,34 +72,40 @@ install_system() {
 install_user() {
     echo "${blue}→${normal} Installing in user directory..."
     mkdir -p "$HOME/.local/bin" "$DATA_DEST"
-    
-    # Download binary
-    (curl -s -o "$HOME/.local/bin/lokio" "$BINARY_URL" && \
-     chmod +x "$HOME/.local/bin/lokio") &
-    spinner $!
 
-    # Download configuration files
-    echo -e "\n${blue}→${normal} Downloading configuration files..."
-    total_files=${#CONFIG_FILES[@]}
+    # Download binary
+    (curl -s -o "$HOME/.local/bin/lokio" "$BINARY_URL" &&
+        chmod +x "$HOME/.local/bin/lokio") &
+    spinner $! "Downloading Lokio binary..."
+
+    # Download and parse YAML file list
+    echo "\n${blue}→${normal} Downloading configuration files..."
+    curl -s -o "$DATA_DEST/list.yaml" "$FILE_LIST_URL"
+
+    # Count total files for progress bar
+    total_files=$(grep "^- url:" "$DATA_DEST/list.yaml" | wc -l)
     current_file=0
 
     # Download each file
-    for url in "${CONFIG_FILES[@]}"; do
+    while IFS=': ' read -r _ url; do
         filename=$(basename "$url")
-        curl -s -o "$DATA_DEST/$filename" "$url"
+        (curl -s -o "$DATA_DEST/$filename" "$url") &
+        spinner $! "Downloading $filename..."
         ((current_file++))
         progress_bar $current_file $total_files
-    done
+    done < <(grep "^- url:" "$DATA_DEST/list.yaml")
     echo # New line after progress bar
 
     # Update PATH if needed
     if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
-        echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"
+        echo 'export PATH="$HOME/.local/bin:$PATH"' >>"$HOME/.bashrc"
         export PATH="$HOME/.local/bin:$PATH"
     fi
 }
 
 # Main installation process
+check_dependencies
+
 if install_system; then
     INSTALL_TYPE="system"
 else
@@ -117,11 +115,11 @@ fi
 
 # Verify installation
 if command -v lokio &>/dev/null; then
-    echo -e "\n${green}✓ Lokio installed successfully!${normal}"
+    echo "\n${green}✓ Lokio installed successfully!${normal}"
     echo "Installation type: ${bold}$INSTALL_TYPE${normal}"
     [ "$INSTALL_TYPE" = "user" ] && echo "Note: You may need to restart your terminal or run 'source ~/.bashrc'"
-    echo -e "\nRun ${bold}lokio${normal} to get started"
+    echo "\nRun ${bold}lokio${normal} to get started"
 else
-    echo -e "\n${red}✗ Installation failed. Please try again.${normal}"
+    echo "\n${red}✗ Installation failed. Please try again.${normal}"
     exit 1
 fi

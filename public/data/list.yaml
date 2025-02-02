@@ -1,0 +1,25 @@
+# info
+- url: https://sh.lokio.dev/data/info.md
+# config
+- url: https://sh.lokio.dev/data/config/astro-frontend.yaml
+- url: https://sh.lokio.dev/data/config/go-backend.yaml
+- url: https://sh.lokio.dev/data/config/hono-backend.yaml
+- url: https://sh.lokio.dev/data/config/kt-mobile-compose-mvvm.yaml
+- url: https://sh.lokio.dev/data/config/next-frontend.yaml
+- url: https://sh.lokio.dev/data/config/next-monolith.yaml
+# ejs.t
+# ejs.t - golang
+- url: https://sh.lokio.dev/data/ejs.t/golang/controller.ejs.t
+# ejs.t - kotlin
+- url: https://sh.lokio.dev/data/ejs.t/kotlin/screen.ejs.t
+# ejs.t - typescript
+- url: https://sh.lokio.dev/data/ejs.t/typescript/call.ejs.t
+- url: https://sh.lokio.dev/data/ejs.t/typescript/component.ejs.t
+- url: https://sh.lokio.dev/data/ejs.t/typescript/controller.ejs.t
+- url: https://sh.lokio.dev/data/ejs.t/typescript/hook.ejs.t
+- url: https://sh.lokio.dev/data/ejs.t/typescript/layout.ejs.t
+- url: https://sh.lokio.dev/data/ejs.t/typescript/middleware.ejs.t
+- url: https://sh.lokio.dev/data/ejs.t/typescript/route.ejs.t
+- url: https://sh.lokio.dev/data/ejs.t/typescript/schema.ejs.t
+- url: https://sh.lokio.dev/data/ejs.t/typescript/screen.ejs.t
+- url: https://sh.lokio.dev/data/ejs.t/typescript/service.ejs.t

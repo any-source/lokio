@@ -1,6 +1,5 @@
 # Configuration
-$ErrorActionPreference = 'Stop'
-$binaryUrl = "https://sh.lokio.dev/bin/lokio.exe"
+$binaryUrl = "https://sh.lokio.dev/bin/windows.exe"
 $installDir = "$env:ProgramFiles\Lokio"
 $maxRetries = 3
 $retryCount = 0

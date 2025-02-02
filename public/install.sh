@@ -1,7 +1,10 @@
 #!/bin/bash
 
-# URL binary
-BINARY_URL="https://sh.lokio.dev/bin/lokio"
+# URL binary untuk berbagai platform
+declare -A BINARY_URLS
+BINARY_URLS["Linux-x86_64"]="https://sh.lokio.dev/bin/linux"
+BINARY_URLS["Darwin-arm64"]="https://sh.lokio.dev/bin/macos-chip"
+BINARY_URLS["Darwin-x86_64"]="https://sh.lokio.dev/bin/macos-intel"
 
 # Warna untuk output
 GREEN='\033[0;32m'
@@ -14,7 +17,7 @@ try_system_install() {
         # Sudo tersedia tanpa password
         sudo mkdir -p "/usr/local/bin"
         echo "Installing to system directory..."
-        sudo curl -# -o "/usr/local/bin/lokio" "$BINARY_URL"
+        sudo curl -# -o "/usr/local/bin/lokio" "$1"
         sudo chmod +x "/usr/local/bin/lokio"
         return 0
     fi
@@ -25,7 +28,7 @@ try_system_install() {
 do_user_install() {
     echo "Installing to user directory..."
     mkdir -p "$HOME/.local/bin"
-    curl -# -o "$HOME/.local/bin/lokio" "$BINARY_URL"
+    curl -# -o "$HOME/.local/bin/lokio" "$1"
     chmod +x "$HOME/.local/bin/lokio"
     
     # Tambahkan ke PATH jika belum ada
@@ -35,15 +38,28 @@ do_user_install() {
     fi
 }
 
+# Deteksi platform dan arsitektur
+OS=$(uname -s)
+ARCH=$(uname -m)
+PLATFORM_KEY="$OS-$ARCH"
+
+# Pilih URL biner yang sesuai
+BINARY_URL="${BINARY_URLS[$PLATFORM_KEY]}"
+
+if [ -z "$BINARY_URL" ]; then
+    echo -e "${RED}Unsupported platform: $PLATFORM_KEY${NC}"
+    exit 1
+fi
+
 # Main installation
-echo "Installing Lokio..."
+echo "Installing Lokio for $PLATFORM_KEY..."
 
 # Coba instalasi sistem dulu
-if try_system_install; then
+if try_system_install "$BINARY_URL"; then
     INSTALL_TYPE="system"
 else
     # Jika gagal, lakukan instalasi user
-    do_user_install
+    do_user_install "$BINARY_URL"
     INSTALL_TYPE="user"
 fi
 

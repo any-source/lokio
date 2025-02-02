@@ -1,6 +1,5 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { getEmbeddedContent } from "@/configs/file-path";
 import { ENV } from "@/environment/main";
 import { Github } from "@/github/readfile";
 import {

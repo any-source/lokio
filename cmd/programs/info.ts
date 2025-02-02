@@ -1,7 +1,5 @@
-import { getEmbeddedContent } from "@/configs/file-path";
 import { ENV } from "@/environment/main";
 import { Github } from "@/github/readfile";
-import { readFileFromGithub } from "@/hooks/use_github";
 import { say } from "@/interfaces/say";
 import { log } from "@/utils/util-use";
 import chalk from "chalk";

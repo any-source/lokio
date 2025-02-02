@@ -1,22 +1,33 @@
 #!/bin/bash
 
-# URL binary untuk berbagai platform
-declare -A BINARY_URLS
-BINARY_URLS["Linux-x86_64"]="install/linux"
-BINARY_URLS["Darwin-arm64"]="install/macos-chip"
-BINARY_URLS["Darwin-x86_64"]="install/macos-intel"
-
 # Warna untuk output
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 NC='\033[0m'
+
+# Deteksi platform dan arsitektur
+OS=$(uname -s)
+ARCH=$(uname -m)
+
+# Tentukan path binary berdasarkan platform
+BINARY_PATH=""
+if [ "$OS" = "Linux" ] && [ "$ARCH" = "x86_64" ]; then
+    BINARY_PATH="install/linux"
+elif [ "$OS" = "Darwin" ] && [ "$ARCH" = "arm64" ]; then
+    BINARY_PATH="install/macos-chip"
+elif [ "$OS" = "Darwin" ] && [ "$ARCH" = "x86_64" ]; then
+    BINARY_PATH="install/macos-intel"
+else
+    echo -e "${RED}Platform tidak didukung: $OS-$ARCH${NC}"
+    exit 1
+fi
 
 # Fungsi untuk mencoba instalasi sistem
 try_system_install() {
     if sudo -n true 2>/dev/null; then
         # Sudo tersedia tanpa password
         sudo mkdir -p "/usr/local/bin"
-        echo "Installing to system directory..."
+        echo "Menginstall ke direktori sistem..."
         sudo cp "$1" "/usr/local/bin/lokio"
         sudo chmod +x "/usr/local/bin/lokio"
         return 0
@@ -26,7 +37,7 @@ try_system_install() {
 
 # Fungsi untuk instalasi user
 do_user_install() {
-    echo "Installing to user directory..."
+    echo "Menginstall ke direktori pengguna..."
     mkdir -p "$HOME/.local/bin"
     cp "$1" "$HOME/.local/bin/lokio"
     chmod +x "$HOME/.local/bin/lokio"
@@ -38,24 +49,12 @@ do_user_install() {
     fi
 }
 
-# Deteksi platform dan arsitektur
-OS=$(uname -s)
-ARCH=$(uname -m)
-PLATFORM_KEY="$OS-$ARCH"
-
-# Pilih URL biner yang sesuai
-BINARY_PATH="${BINARY_URLS[$PLATFORM_KEY]}"
-if [ -z "$BINARY_PATH" ]; then
-    echo -e "${RED}Unsupported platform: $PLATFORM_KEY${NC}"
-    exit 1
-fi
-
 # Main installation
-echo "Installing Lokio for $PLATFORM_KEY..."
+echo "Menginstall Lokio untuk $OS-$ARCH..."
 
-# Verifikasi keberadaan file
+# Periksa apakah file binary ada
 if [ ! -f "$BINARY_PATH" ]; then
-    echo -e "${RED}Binary file not found at: $BINARY_PATH${NC}"
+    echo -e "${RED}File binary tidak ditemukan di: $BINARY_PATH${NC}"
     exit 1
 fi
 
@@ -70,13 +69,13 @@ fi
 
 # Verifikasi instalasi
 if command -v lokio &> /dev/null; then
-    echo -e "\n${GREEN}Congratulations! Lokio has been installed successfully!${NC}"
-    echo -e "Installation type: $INSTALL_TYPE"
+    echo -e "\n${GREEN}Selamat! Lokio berhasil diinstall!${NC}"
+    echo -e "Tipe instalasi: $INSTALL_TYPE"
     if [ "$INSTALL_TYPE" = "user" ]; then
-        echo -e "Note: You may need to restart your terminal or run 'source ~/.bashrc'"
+        echo -e "Catatan: Anda mungkin perlu me-restart terminal atau menjalankan 'source ~/.bashrc'"
     fi
-    echo -e "Let's run 'lokio'"
+    echo -e "Mari jalankan 'lokio'"
 else
-    echo -e "\n${RED}Installation failed. Please try again.${NC}"
+    echo -e "\n${RED}Instalasi gagal. Silakan coba lagi.${NC}"
     exit 1
 fi

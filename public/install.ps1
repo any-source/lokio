@@ -1,5 +1,5 @@
 # Configuration
-$binaryUrl = "http://103.127.96.116:9000/install/windows.exe"
+$binaryUrl = "https://lokio.dev/install/windows.exe"
 $installDir = "$env:ProgramFiles\Lokio"
 $maxRetries = 3
 $retryCount = 0

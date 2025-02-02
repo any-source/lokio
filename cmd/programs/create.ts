@@ -16,13 +16,7 @@ export const ProgramCreate = async (program: Command) => {
 			const pkg_name = await CommandProjectName();
 			const tmp = await CommandChooseBoilerplate();
 			const dep = await CommandInstallDependencies();
-
 			const lang = tmp.lang as SupportedLanguage;
-
-			console.log("Direct project name:", pkg_name);
-			console.log("Direct project name:", JSON.stringify(tmp));
-			console.log("Direct project name:", JSON.stringify(dep));
-
 			await copyTemplate({
 				install: dep,
 				projectName: pkg_name,

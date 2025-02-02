@@ -1,19 +1,7 @@
 #!/bin/bash
 
 BINARY_URL="https://sh.lokio.dev/bin/lokio"
-CONFIG_URLS=(
-    "https://sh.lokio.dev/data/info.md"
-    "https://sh.lokio.dev/data/config/astro-frontend.yaml"
-    "https://sh.lokio.dev/data/config/go-backend.yaml"
-    "https://sh.lokio.dev/data/config/hono-backend.yaml"
-    "https://sh.lokio.dev/data/config/kt-mobile-compose-mvvm.yaml"
-    "https://sh.lokio.dev/data/config/next-frontend.yaml"
-    "https://sh.lokio.dev/data/config/next-monolith.yaml"
-    "https://sh.lokio.dev/data/ejs.t/golang/controller.ejs.t"
-    "https://sh.lokio.dev/data/ejs.t/kotlin/screen.ejs.t"
-)
 INSTALL_DIR="/usr/local/bin"
-DATA_DIR="$HOME/.lokio"
 
 # Modern UI helper functions
 write_color_text() {
@@ -53,45 +41,16 @@ write_error() {
     write_color_text "$message" "red"
 }
 
-show_progress() {
-    local current=$1
-    local total=$2
-    local activity=$3
-
-    local percentage=$((current * 100 / total))
-    local width=50
-    local completed=$((width * current / total))
-    local remaining=$((width - completed))
-
-    printf "\r%s [%-${width}s] %d%%" "$activity" "$(printf "%${completed}s" | tr ' ' '█')$(printf "%${remaining}s" | tr ' ' '░')" "$percentage"
-}
-
-install_lokio_files() {
+install_lokio_binary() {
     try {
-        # Create installation directories
-        write_step "Creating installation directories..."
+        # Create installation directory
+        write_step "Creating installation directory..."
         mkdir -p "$INSTALL_DIR"
-        mkdir -p "$DATA_DIR"
 
         # Download and install binary
         write_step "Downloading Lokio binary..."
         curl -L "$BINARY_URL" -o "$INSTALL_DIR/lokio"
         chmod +x "$INSTALL_DIR/lokio"  # Make the binary executable
-
-        # Download configuration files
-        write_step "Downloading configuration files..."
-        total_files=${#CONFIG_URLS[@]}
-        current_file=0
-
-        for url in "${CONFIG_URLS[@]}"; do
-            filename=$(basename "$url")
-            out_path="$DATA_DIR/$filename"
-
-            curl -L "$url" -o "$out_path"
-            current_file=$((current_file + 1))
-            show_progress "$current_file" "$total_files" "Downloading files"
-        done
-        echo
 
         # Add to PATH (if not already added)
         write_step "Updating system PATH..."
@@ -117,7 +76,7 @@ test_admin_privileges() {
 
 # Main installation process
 clear
-write_color_text "🚀 Lokio Installer for macOS/Linux" "cyan"
+write_color_text "🚀 Lokio Binary Installer for macOS/Linux" "cyan"
 echo
 
 if ! test_admin_privileges; then
@@ -125,13 +84,12 @@ if ! test_admin_privileges; then
     exit 1
 fi
 
-echo "Installation will use these locations:"
+echo "Installation will use this location:"
 echo "- Program files: $INSTALL_DIR"
-echo "- Data files: $DATA_DIR"
 echo
 
-if install_lokio_files; then
-    write_success "Lokio has been successfully installed!"
+if install_lokio_binary; then
+    write_success "Lokio binary has been successfully installed!"
     echo
     echo "You can now use 'lokio' from any terminal window."
     echo "Note: You may need to restart your terminal session for PATH changes to take effect."

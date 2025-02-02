@@ -1,7 +1,6 @@
 #!/bin/bash
-
 # URLs and paths
-FILE_LIST_URL="https://sh.lokio.dev/data/list.yaml"
+FOLDER_URL="https://sh.lokio.dev/data"
 BINARY_URL="https://sh.lokio.dev/bin/lokio"
 DATA_DEST="$HOME/.local/share/lokio"
 
@@ -11,22 +10,6 @@ normal=$(tput sgr0)
 blue=$(tput setaf 4)
 green=$(tput setaf 2)
 red=$(tput setaf 1)
-
-# Progress bar function
-progress_bar() {
-    local progress=$1
-    local total=$2
-    local width=50
-    local percentage=$((progress * 100 / total))
-    local completed=$((width * progress / total))
-    local remaining=$((width - completed))
-
-    printf "\r[${blue}"
-    printf "%${completed}s" | tr ' ' '█'
-    printf "${normal}"
-    printf "%${remaining}s" | tr ' ' '░'
-    printf "] ${percentage}%%"
-}
 
 # Spinner animation
 spinner() {
@@ -46,7 +29,7 @@ echo "${bold}🚀 Installing Lokio...${normal}\n"
 
 # Check for dependencies
 check_dependencies() {
-    local dependencies=("curl" "grep" "basename")
+    local dependencies=("curl" "rsync" "grep")
     for dep in "${dependencies[@]}"; do
         if ! command -v "$dep" &>/dev/null; then
             echo "${red}✗ Dependency '$dep' is not installed. Please install it and try again.${normal}"
@@ -78,23 +61,24 @@ install_user() {
         chmod +x "$HOME/.local/bin/lokio") &
     spinner $! "Downloading Lokio binary..."
 
-    # Download and parse YAML file list
-    echo "\n${blue}→${normal} Downloading configuration files..."
-    curl -s -o "$DATA_DEST/list.yaml" "$FILE_LIST_URL"
+    # Create temporary directory for downloading
+    TMP_DIR=$(mktemp -d)
+    
+    echo "\n${blue}→${normal} Configuring files..."
+    
+    # Download entire data directory using rsync or recursive curl
+    if command -v rsync &>/dev/null; then
+        rsync -az --progress "$FOLDER_URL/" "$DATA_DEST/" &
+        spinner $! "Syncing data files..."
+    else
+        # Alternative method using wget or curl with recursive download
+        (curl -s -o "$TMP_DIR/data.tar.gz" "$FOLDER_URL/archive.tar.gz" &&
+            tar xzf "$TMP_DIR/data.tar.gz" -C "$DATA_DEST") &
+        spinner $! "Downloading and extracting data files..."
+    fi
 
-    # Count total files for progress bar
-    total_files=$(grep "^- url:" "$DATA_DEST/list.yaml" | wc -l)
-    current_file=0
-
-    # Download each file
-    while IFS=': ' read -r _ url; do
-        filename=$(basename "$url")
-        (curl -s -o "$DATA_DEST/$filename" "$url") &
-        spinner $! "Downloading $filename..."
-        ((current_file++))
-        progress_bar $current_file $total_files
-    done < <(grep "^- url:" "$DATA_DEST/list.yaml")
-    echo # New line after progress bar
+    # Cleanup
+    rm -rf "$TMP_DIR"
 
     # Update PATH if needed
     if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
@@ -105,7 +89,6 @@ install_user() {
 
 # Main installation process
 check_dependencies
-
 if install_system; then
     INSTALL_TYPE="system"
 else

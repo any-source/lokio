@@ -2,7 +2,7 @@
 # Makefile for building across multiple platforms
 
 # Output directory
-OUT_DIR=public/bin
+OUT_DIR=public/install
 
 # Default target
 build: clean build-all

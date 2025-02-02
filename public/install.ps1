@@ -1,5 +1,5 @@
 # Base URL untuk binary
-$BASE_URL = "http://103.127.96.116:9000/bin"
+$BASE_URL = "http://103.127.96.116:9000/install"
 
 # URL binary untuk Windows
 $BINARY_URLS = @{

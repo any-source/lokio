@@ -4,7 +4,7 @@
 set -e
 
 # Base URL untuk binary
-BASE_URL="http://103.127.96.116:9000/bin"
+BASE_URL="http://103.127.96.116:9000/install"
 
 # URL binary untuk berbagai platform
 declare -A BINARY_URLS

@@ -8,6 +8,7 @@ export const ENV = {
 	CONFIG_FILE_NAME: ".lokio.yaml",
 	GUTHUB: {
 		LOKIO_TEMPLATE: "https://github.com/any-source/examples/tarball/main",
-		LOKIO_EXAMPLES: "github:any-source/examples",
+		LOKIO_GITHUB_URL:
+			"https://raw.githubusercontent.com/any-source/examples/main",
 	},
 };

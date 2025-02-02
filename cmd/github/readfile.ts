@@ -7,15 +7,9 @@ type GithubTypeResults = {
 };
 export const Github = async (): Promise<GithubTypeResults> => {
 	try {
-		const GITHUB_MARKDOWN_INFO = await readFileFromGithub(
-			ENV.GUTHUB.LOKIO_EXAMPLES,
-			"markdown/info.md",
-		);
+		const GITHUB_MARKDOWN_INFO = await readFileFromGithub("markdown/info.md");
 		const CONFIG_YAML = async (tmpl: string) =>
-			await readFileFromGithub(
-				ENV.GUTHUB.LOKIO_EXAMPLES,
-				`configs/${tmpl}.yaml`,
-			);
+			await readFileFromGithub(`configs/${tmpl}.yaml`);
 		return {
 			GITHUB_MARKDOWN_INFO,
 			CONFIG_YAML,

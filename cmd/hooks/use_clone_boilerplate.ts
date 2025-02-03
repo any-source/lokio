@@ -33,12 +33,8 @@ async function ensureDirectory(dir: string): Promise<void> {
 	}
 }
 
-async function copyConfig(
-	tmpl: string,
-	projectName: string,
-	projectDir: string,
-): Promise<void> {
-	const destPath = path.join(projectDir, ".lokio.yaml");
+async function copyConfig(tmpl: string, projectName: string): Promise<void> {
+	const destPath = path.join(projectName, ".lokio.yaml");
 	try {
 		const { CONFIG_YAML } = await Github();
 		const yamlContent = await CONFIG_YAML(tmpl);
@@ -83,30 +79,28 @@ async function processLanguageSpecific(
 export default async function copyTemplate(
 	options: TemplateOptions,
 ): Promise<void> {
-	const cwd = process.cwd();
-	const projectDir = path.join(cwd, options.projectName);
-	const { tmpl, lang, install } = options;
+	const { tmpl, projectName, lang, install } = options;
 
 	try {
 		log(chalk.blue(TEXT.CLONE_PROJECT.START_SETUP));
-		await ensureDirectory(projectDir);
+		await ensureDirectory(projectName);
 
 		// Download template using giget-core
 		// Format: owner/repo/subdir#ref
 		const templatePath = `any-source/examples/code/${tmpl}#main`;
 		await downloadTemplate(templatePath, {
-			dir: projectDir,
+			dir: projectName,
 			force: true,
 		});
 		log(chalk.green(TEXT.CLONE_PROJECT.TEMPLATE_COPIED));
 
 		// Copy and update configuration
-		await copyConfig(tmpl, projectDir, projectDir);
+		await copyConfig(tmpl, projectName);
 
 		// Process language-specific files
-		await processLanguageSpecific(lang, projectDir, projectDir, install);
+		await processLanguageSpecific(lang, projectName, projectName, install);
 
-		log(chalk.green(TEXT.CLONE_PROJECT.SUCCESS(projectDir)));
+		log(chalk.green(TEXT.CLONE_PROJECT.SUCCESS(projectName)));
 	} catch (error) {
 		log(chalk.red(TEXT.CLONE_PROJECT.FAILURE));
 		log(chalk.red((error as Error).message));

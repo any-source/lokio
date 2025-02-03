@@ -10,6 +10,7 @@ import {
 	installDependenciesTypescript,
 	processFilesTypescript,
 } from "@/services/install/typescript";
+import { log } from "@/utils/util-use";
 import chalk from "chalk";
 import { getDirFromGithub } from "./use_github";
 
@@ -56,7 +57,7 @@ class TemplateManager {
 		try {
 			await fs.rm(dir, { recursive: true, force: true }).catch(() => {});
 		} catch (error) {
-			console.warn(chalk.yellow(`Warning: Failed to clean directory ${dir}`));
+			log(chalk.yellow(`Warning: Failed to clean directory ${dir} : ${error}`));
 		}
 	}
 
@@ -71,10 +72,10 @@ class TemplateManager {
 				`package: ${projectName}`,
 			);
 			await fs.writeFile(destPath, updatedContent, "utf8");
-			console.log(chalk.green("✓ Configuration file copied successfully"));
+			log(chalk.green("✓ Configuration file copied successfully"));
 		} catch (error) {
 			if ((error as NodeJS.ErrnoException).code === "ENOENT") {
-				console.warn(chalk.yellow(`⚠️ Configuration file not found: ${error}`));
+				log(chalk.yellow(`⚠️ Configuration file not found: ${error}`));
 				return;
 			}
 			throw new Error(
@@ -106,14 +107,14 @@ class TemplateManager {
 		const { tempDir, projectDir, templatePath } = this.paths;
 		try {
 			// Initial setup
-			console.log(chalk.blue("🚀 Starting template setup..."));
+			log(chalk.blue("🚀 Starting template setup..."));
 			await this.cleanDirectory(tempDir);
 			await this.ensureDirectory(projectDir);
 
 			// Download and copy template
 			await getDirFromGithub(ENV.GUTHUB.LOKIO_TEMPLATE, tempDir);
 			await fs.cp(templatePath, projectDir, { recursive: true });
-			console.log(chalk.green("✓ Template files copied"));
+			log(chalk.green("✓ Template files copied"));
 
 			// Process configuration and language-specific setup
 			await this.copyConfig();
@@ -121,14 +122,14 @@ class TemplateManager {
 
 			// Cleanup and finish
 			await this.cleanDirectory(tempDir);
-			console.log(
+			log(
 				chalk.green(
 					`\n🎉 Success! Project ${this.options.projectName} is ready!`,
 				),
 			);
 		} catch (error) {
-			console.error(chalk.red("\n❌ Template creation failed:"));
-			console.error(chalk.red((error as Error).message));
+			log(chalk.red("\n❌ Template creation failed:"));
+			log(chalk.red((error as Error).message));
 			await this.cleanDirectory(tempDir);
 			throw error;
 		}

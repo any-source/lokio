@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { log } from "@/utils/util-use";
 import color from "chalk";
 
 type VersionType = "major" | "minor" | "patch";
@@ -62,9 +63,7 @@ async function updatePackageVersion({
 			"utf-8",
 		);
 
-		console.log(
-			color.green(`✓ Version updated: ${currentVersion} → ${newVersion}`),
-		);
+		log(color.green(`✓ Version updated: ${currentVersion} → ${newVersion}`));
 	} catch (error) {
 		console.error(color.red("\n❌ Version update failed:"));
 		console.error(color.red((error as Error).message));

@@ -3,7 +3,7 @@
 # Output directory
 OUT_DIR=public/artifacts
 
-build:
+build: format
 	@bun build bin/main.ts --outdir bin --target bun --minify
 
 push:

@@ -11,7 +11,7 @@ export const ProgramInit = async (program: Command, exist = false) => {
 		.version(ENV.VERSION, "-v, --version", TEXT.PROGRAM.VERSION_DESCRIPTION)
 		.action(async () => {
 			await say(
-				[TEXT.PROGRAM.INIT.STEP1, TEXT.PROGRAM.INIT.STEP2] as string[],
+				[TEXT.PROGRAM.SAY.INIT.STEP1, TEXT.PROGRAM.SAY.INIT.STEP2] as string[],
 				{
 					clear: false,
 					hat: "",

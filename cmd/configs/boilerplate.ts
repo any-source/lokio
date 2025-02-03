@@ -85,3 +85,21 @@ export const BOILERPLATE_OPTIONS: BOILERPLATE_OPTIONS_TYPE[] = [
 		],
 	},
 ];
+
+export const BoilerplateShowLabel = (value: string): string => {
+	const findLabel = (
+		options: BOILERPLATE_OPTIONS_TYPE[],
+	): string | undefined => {
+		for (const item of options) {
+			if (item.value === value) {
+				return item.label;
+			}
+			if (item.children) {
+				const childResult = findLabel(item.children);
+				if (childResult) return childResult;
+			}
+		}
+		return undefined;
+	};
+	return findLabel(BOILERPLATE_OPTIONS) || value;
+};

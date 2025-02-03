@@ -20,8 +20,8 @@ export const CommandProjectName = async (): Promise<string> => {
 				return "Project name cannot contain spaces";
 			}
 
-			if (!/^[a-z][a-z0-9_]*$/.test(value)) {
-				return "Project name must start with a lowercase letter and can only contain lowercase letters, numbers, and underscores (no numbers at the start)";
+			if (!/^[a-zA-Z][a-zA-Z0-9_]*$/.test(value)) {
+				return "Project name must start with a letter and can only contain letters, numbers, and underscores (no numbers at the start)";
 			}
 
 			if (value.length > 30) {

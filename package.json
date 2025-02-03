@@ -1,10 +1,21 @@
 {
-	"name": "lokio",
-	"version": "1.0.8",
+	"name": "lokio-assistant",
+	"version": "0.0.1",
 	"author": {
 		"name": "wahyu agus arifin",
 		"email": "itpohgero@gmail.com",
 		"url": "https://github.com/itpohgero"
+	},
+	"license": "MIT",
+	"type": "module",
+	"main": "./bin/index.js",
+	"types": "./bin/index.d.ts",
+	"bin": {
+		"lokio": "./bin/index.js"
+	},
+	"engines": {
+		"node": ">=18.0.0",
+		"bun": ">=1.0.0"
 	},
 	"scripts": {
 		"format": "bun run biome:format && bun run biome:check && bun run biome:lint",
@@ -12,8 +23,6 @@
 		"biome:check": "bunx biome check --write .",
 		"biome:lint": "bunx biome lint --write ."
 	},
-	"module": "index.ts",
-	"type": "module",
 	"files": ["cmd/", "bin/index.ts"],
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
@@ -30,5 +39,25 @@
 		"log-update": "^6.1.0",
 		"ora": "^8.1.1",
 		"yaml": "^2.7.0"
+	},
+	"keywords": [
+		"lokio",
+		"project-generator",
+		"scaffolding",
+		"development-tools",
+		"mataramandev",
+		"wahyu-agus-arifin",
+		"itpohgero"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/any-source/lokio.git"
+	},
+	"bugs": {
+		"url": "https://github.com/any-source/lokio/issues"
+	},
+	"homepage": "https://lokio.dev",
+	"publishConfig": {
+		"access": "public"
 	}
 }

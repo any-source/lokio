@@ -25,4 +25,15 @@ export const TEXT = {
 			VERSION: "(-v) Check the current version",
 		},
 	},
+	CLONE_PROJECT: {
+		START_SETUP: "🚀 Starting template setup...",
+		DIR_CLEAN_FAILED: "Warning: Failed to clean directory",
+		CONFIG_COPY_SUCCESS: "✓ Configuration file copied successfully",
+		CONFIG_NOT_FOUND: "⚠️ Configuration file not found",
+		CONFIG_COPY_FAILED: "Failed to copy configuration",
+		TEMPLATE_COPIED: "✓ Template files copied",
+		SUCCESS: (projectName: string) =>
+			`\n🎉 Success! Project ${projectName} is ready!`,
+		FAILURE: "\n❌ Template creation failed:",
+	},
 };

@@ -1,6 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { ENV } from "@/environment/main";
+import { TEXT } from "@/environment/text";
 import { Github } from "@/github/readfile";
 import {
 	installDependenciesGolang,
@@ -57,7 +58,11 @@ class TemplateManager {
 		try {
 			await fs.rm(dir, { recursive: true, force: true }).catch(() => {});
 		} catch (error) {
-			log(chalk.yellow(`Warning: Failed to clean directory ${dir} : ${error}`));
+			log(
+				chalk.yellow(
+					`${TEXT.CLONE_PROJECT.DIR_CLEAN_FAILED} ${dir} : ${error}`,
+				),
+			);
 		}
 	}
 
@@ -72,14 +77,14 @@ class TemplateManager {
 				`package: ${projectName}`,
 			);
 			await fs.writeFile(destPath, updatedContent, "utf8");
-			log(chalk.green("✓ Configuration file copied successfully"));
+			log(chalk.green(TEXT.CLONE_PROJECT.CONFIG_COPY_SUCCESS));
 		} catch (error) {
 			if ((error as NodeJS.ErrnoException).code === "ENOENT") {
-				log(chalk.yellow(`⚠️ Configuration file not found: ${error}`));
+				log(chalk.yellow(`${TEXT.CLONE_PROJECT.CONFIG_NOT_FOUND}: ${error}`));
 				return;
 			}
 			throw new Error(
-				`Failed to copy configuration: ${(error as Error).message}`,
+				`${TEXT.CLONE_PROJECT.CONFIG_COPY_FAILED}: ${(error as Error).message}`,
 			);
 		}
 	}
@@ -106,29 +111,21 @@ class TemplateManager {
 	public async execute(): Promise<void> {
 		const { tempDir, projectDir, templatePath } = this.paths;
 		try {
-			// Initial setup
-			log(chalk.blue("🚀 Starting template setup..."));
+			log(chalk.blue(TEXT.CLONE_PROJECT.START_SETUP));
 			await this.cleanDirectory(tempDir);
 			await this.ensureDirectory(projectDir);
 
-			// Download and copy template
 			await getDirFromGithub(ENV.GUTHUB.LOKIO_TEMPLATE, tempDir);
 			await fs.cp(templatePath, projectDir, { recursive: true });
-			log(chalk.green("✓ Template files copied"));
+			log(chalk.green(TEXT.CLONE_PROJECT.TEMPLATE_COPIED));
 
-			// Process configuration and language-specific setup
 			await this.copyConfig();
 			await this.processLanguageSpecific();
 
-			// Cleanup and finish
 			await this.cleanDirectory(tempDir);
-			log(
-				chalk.green(
-					`\n🎉 Success! Project ${this.options.projectName} is ready!`,
-				),
-			);
+			log(chalk.green(TEXT.CLONE_PROJECT.SUCCESS(this.options.projectName)));
 		} catch (error) {
-			log(chalk.red("\n❌ Template creation failed:"));
+			log(chalk.red(TEXT.CLONE_PROJECT.FAILURE));
 			log(chalk.red((error as Error).message));
 			await this.cleanDirectory(tempDir);
 			throw error;
@@ -136,7 +133,6 @@ class TemplateManager {
 	}
 }
 
-// Export the main function
 export default async function copyTemplate(
 	options: TemplateOptions,
 ): Promise<void> {

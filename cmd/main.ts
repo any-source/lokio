@@ -12,7 +12,7 @@ export const run = async () => {
 	try {
 		const program = new Command();
 		const { exist, data } = useReadConfig();
-		await ProgramInit(program);
+		await ProgramInit(program, exist);
 		if (!exist) {
 			clearContext();
 			await ProgramCreate(program);
@@ -25,6 +25,13 @@ export const run = async () => {
 		}
 
 		await ProgramInfo(program);
+		// **Tangani error jika command tidak ditemukan**
+		program.exitOverride((err) => {
+			if (err.code === "commander.unknownCommand") {
+				console.error("❌ Salah woy! Perintah tidak ditemukan.\n");
+				program.help(); // Tampilkan daftar perintah yang tersedia
+			}
+		});
 		program.parse(process.argv);
 	} catch (error) {
 		console.error(`${TEXT.PROGRAM.ERROR_RUN}:`, error);

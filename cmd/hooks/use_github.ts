@@ -1,5 +1,4 @@
 import fs from "node:fs/promises";
-import path from "node:path";
 import { ENV } from "@/environment/main";
 import { downloadTemplate } from "@bluwy/giget-core";
 import chalk from "chalk";

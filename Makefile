@@ -3,27 +3,8 @@
 # Output directory
 OUT_DIR=public/artifacts
 
-build-npm:
+build:
 	@bun build bin/main.ts --outdir bin --target bun --minify
-
-build-binary: build-bin-windows build-bin-linux build-bin-mac
-	@echo "🚀 Builds for all platforms completed!"
-
-build-bin-windows:
-	@bun build --compile --target=bun-windows-x64 bin/main.ts --outfile=$(OUT_DIR)/windows.exe	
-
-build-bin-linux:
-	@bun build --compile --target=bun-linux-x64 bin/main.ts --outfile=$(OUT_DIR)/linux
-
-build-bin-mac:
-	@bun build --compile bin/main.ts --outfile=$(OUT_DIR)/macos	
-	@bun build --compile --target=bun-darwin-x64 bin/main.ts --outfile=$(OUT_DIR)/macos-intel	
-	@bun build --compile --target=bun-darwin-arm64 bin/main.ts --outfile=$(OUT_DIR)/macos-chip
-
-clean-bin:
-	@echo "🧹 Cleaning build artifacts..."
-	@rm -rf $(OUT_DIR)/*
-	@echo "✅ Build artifacts cleaned!"
 
 push:
 	@echo "🚀 Running push.sh..."

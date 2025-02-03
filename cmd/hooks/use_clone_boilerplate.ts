@@ -1,6 +1,5 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import { ENV } from "@/environment/main";
 import { TEXT } from "@/environment/text";
 import { Github } from "@/github/readfile";
 import {
@@ -12,8 +11,8 @@ import {
 	processFilesTypescript,
 } from "@/services/install/typescript";
 import { log } from "@/utils/util-use";
+import { downloadTemplate } from "@bluwy/giget-core";
 import chalk from "chalk";
-import { getDirFromGithub } from "./use_github";
 
 export type SupportedLanguage = "ts" | "go" | "kt";
 
@@ -24,118 +23,93 @@ interface TemplateOptions {
 	lang: SupportedLanguage;
 }
 
-interface Paths {
-	tempDir: string;
-	projectDir: string;
-	templatePath: string;
+async function ensureDirectory(dir: string): Promise<void> {
+	try {
+		await fs.mkdir(dir, { recursive: true });
+	} catch (error) {
+		throw new Error(
+			`Failed to create directory ${dir}: ${(error as Error).message}`,
+		);
+	}
 }
 
-class TemplateManager {
-	private readonly paths: Paths;
-	private readonly options: TemplateOptions;
-
-	constructor(options: TemplateOptions) {
-		const cwd = process.cwd();
-		this.options = options;
-		this.paths = {
-			tempDir: path.join(cwd, ".temp-clone"),
-			projectDir: path.join(cwd, options.projectName),
-			templatePath: path.join(cwd, ".temp-clone", "code", options.tmpl),
-		};
-	}
-
-	private async ensureDirectory(dir: string): Promise<void> {
-		try {
-			await fs.mkdir(dir, { recursive: true });
-		} catch (error) {
-			throw new Error(
-				`Failed to create directory ${dir}: ${(error as Error).message}`,
-			);
+async function copyConfig(
+	tmpl: string,
+	projectName: string,
+	projectDir: string,
+): Promise<void> {
+	const destPath = path.join(projectDir, ".lokio.yaml");
+	try {
+		const { CONFIG_YAML } = await Github();
+		const yamlContent = await CONFIG_YAML(tmpl);
+		const updatedContent = yamlContent.replace(
+			/package:\s*.+/,
+			`package: ${projectName}`,
+		);
+		await fs.writeFile(destPath, updatedContent, "utf8");
+		log(chalk.green(TEXT.CLONE_PROJECT.CONFIG_COPY_SUCCESS));
+	} catch (error) {
+		if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+			log(chalk.yellow(`${TEXT.CLONE_PROJECT.CONFIG_NOT_FOUND}: ${error}`));
+			return;
 		}
+		throw new Error(
+			`${TEXT.CLONE_PROJECT.CONFIG_COPY_FAILED}: ${(error as Error).message}`,
+		);
 	}
+}
 
-	private async cleanDirectory(dir: string): Promise<void> {
-		try {
-			await fs.rm(dir, { recursive: true, force: true }).catch(() => {});
-		} catch (error) {
-			log(
-				chalk.yellow(
-					`${TEXT.CLONE_PROJECT.DIR_CLEAN_FAILED} ${dir} : ${error}`,
-				),
-			);
-		}
-	}
+async function processLanguageSpecific(
+	lang: SupportedLanguage,
+	projectDir: string,
+	projectName: string,
+	install: boolean,
+): Promise<void> {
+	const handlers = {
+		ts: async () => {
+			await processFilesTypescript(projectDir, projectName);
+			if (install) await installDependenciesTypescript(projectDir);
+		},
+		go: async () => {
+			await processFilesGolang(projectDir, projectName);
+			if (install) await installDependenciesGolang(projectDir);
+		},
+		kt: async () => {},
+	};
 
-	private async copyConfig(): Promise<void> {
-		const { tmpl, projectName } = this.options;
-		const destPath = path.join(this.paths.projectDir, ".lokio.yaml");
-		try {
-			const { CONFIG_YAML } = await Github();
-			const yamlContent = await CONFIG_YAML(tmpl);
-			const updatedContent = yamlContent.replace(
-				/package:\s*.+/,
-				`package: ${projectName}`,
-			);
-			await fs.writeFile(destPath, updatedContent, "utf8");
-			log(chalk.green(TEXT.CLONE_PROJECT.CONFIG_COPY_SUCCESS));
-		} catch (error) {
-			if ((error as NodeJS.ErrnoException).code === "ENOENT") {
-				log(chalk.yellow(`${TEXT.CLONE_PROJECT.CONFIG_NOT_FOUND}: ${error}`));
-				return;
-			}
-			throw new Error(
-				`${TEXT.CLONE_PROJECT.CONFIG_COPY_FAILED}: ${(error as Error).message}`,
-			);
-		}
-	}
-
-	private async processLanguageSpecific(): Promise<void> {
-		const { lang, install } = this.options;
-		const { projectDir } = this.paths;
-
-		const handlers = {
-			ts: async () => {
-				await processFilesTypescript(projectDir, this.options.projectName);
-				if (install) await installDependenciesTypescript(projectDir);
-			},
-			go: async () => {
-				await processFilesGolang(projectDir, this.options.projectName);
-				if (install) await installDependenciesGolang(projectDir);
-			},
-			kt: async () => {},
-		};
-
-		await handlers[lang]();
-	}
-
-	public async execute(): Promise<void> {
-		const { tempDir, projectDir, templatePath } = this.paths;
-		try {
-			log(chalk.blue(TEXT.CLONE_PROJECT.START_SETUP));
-			await this.cleanDirectory(tempDir);
-			await this.ensureDirectory(projectDir);
-
-			await getDirFromGithub(ENV.GUTHUB.LOKIO_TEMPLATE, tempDir);
-			await fs.cp(templatePath, projectDir, { recursive: true });
-			log(chalk.green(TEXT.CLONE_PROJECT.TEMPLATE_COPIED));
-
-			await this.copyConfig();
-			await this.processLanguageSpecific();
-
-			await this.cleanDirectory(tempDir);
-			log(chalk.green(TEXT.CLONE_PROJECT.SUCCESS(this.options.projectName)));
-		} catch (error) {
-			log(chalk.red(TEXT.CLONE_PROJECT.FAILURE));
-			log(chalk.red((error as Error).message));
-			await this.cleanDirectory(tempDir);
-			throw error;
-		}
-	}
+	await handlers[lang]();
 }
 
 export default async function copyTemplate(
 	options: TemplateOptions,
 ): Promise<void> {
-	const manager = new TemplateManager(options);
-	await manager.execute();
+	const cwd = process.cwd();
+	const projectDir = path.join(cwd, options.projectName);
+	const { tmpl, lang, install } = options;
+
+	try {
+		log(chalk.blue(TEXT.CLONE_PROJECT.START_SETUP));
+		await ensureDirectory(projectDir);
+
+		// Download template using giget-core
+		// Format: owner/repo/subdir#ref
+		const templatePath = `any-source/examples/code/${tmpl}#main`;
+		await downloadTemplate(templatePath, {
+			dir: projectDir,
+			force: true,
+		});
+		log(chalk.green(TEXT.CLONE_PROJECT.TEMPLATE_COPIED));
+
+		// Copy and update configuration
+		await copyConfig(tmpl, projectDir, projectDir);
+
+		// Process language-specific files
+		await processLanguageSpecific(lang, projectDir, projectDir, install);
+
+		log(chalk.green(TEXT.CLONE_PROJECT.SUCCESS(projectDir)));
+	} catch (error) {
+		log(chalk.red(TEXT.CLONE_PROJECT.FAILURE));
+		log(chalk.red((error as Error).message));
+		throw error;
+	}
 }

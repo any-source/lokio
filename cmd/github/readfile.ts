@@ -1,5 +1,5 @@
-import { ENV } from "@/environment/main";
 import { readFileFromGithub } from "@/hooks/use_github";
+import { log } from "@/utils/util-use";
 
 type GithubTypeResults = {
 	GITHUB_MARKDOWN_INFO: string;
@@ -15,7 +15,11 @@ export const Github = async (): Promise<GithubTypeResults> => {
 			CONFIG_YAML,
 		};
 	} catch (error) {
-		console.log(error);
+		if (error instanceof Error) {
+			log(error.message);
+		} else {
+			log(String(error));
+		}
 		return {
 			GITHUB_MARKDOWN_INFO: "",
 			CONFIG_YAML: async () => "",

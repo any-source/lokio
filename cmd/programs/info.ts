@@ -1,4 +1,5 @@
 import { ENV } from "@/environment/main";
+import { TEXT } from "@/environment/text";
 import { Github } from "@/github/readfile";
 import { say } from "@/interfaces/say";
 import { log } from "@/utils/util-use";
@@ -9,14 +10,11 @@ export const ProgramInfo = async (program: Command) => {
 	program
 		.command("info")
 		.alias("i")
-		.description(`Show information about the ${ENV.NAME}`)
+		.description(TEXT.PROGRAM.INFORMATION)
 		.action(async () => {
 			const data = await Github();
 			await say(
-				[
-					["Welcome", "to", ENV.VERSION],
-					`Let's show information about the ${ENV.NAME}!`,
-				] as string[],
+				[TEXT.PROGRAM.SAY.INFO.STEP1, TEXT.PROGRAM.SAY.INFO.STEP2] as string[],
 				{ clear: false, hat: "", tie: "" },
 			);
 			log(`${data.GITHUB_MARKDOWN_INFO}\n`);

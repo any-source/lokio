@@ -1,36 +1,10 @@
 # Makefile
-# Makefile for building across multiple platforms
 
 # Output directory
-OUT_DIR=public/install
+OUT_DIR=public/artifacts
 
-# Default target
-build: clean build-all
-	@echo "✅ All builds completed!"
-
-# Build for all platforms
-build-all: build-windows build-linux build-mac
-	@echo "🚀 Builds for all platforms completed!"
-
-# Build for Windows
-build-windows:
-	@bun build --compile --target=bun-windows-x64 bin/main.ts --outfile=$(OUT_DIR)/windows.exe	
-
-# Build for Linux
-build-linux:
-	@bun build --compile --target=bun-linux-x64 bin/main.ts --outfile=$(OUT_DIR)/linux
-	
-
-# Build for macOS
-build-mac:
-	@bun build --compile --target=bun-darwin-x64 bin/main.ts --outfile=$(OUT_DIR)/macos-intel	
-	@bun build --compile --target=bun-darwin-arm64 bin/main.ts --outfile=$(OUT_DIR)/macos-chip
-
-# Clean build artifacts
-clean:
-	@echo "🧹 Cleaning build artifacts..."
-	@rm -rf $(OUT_DIR)/*
-	@echo "✅ Build artifacts cleaned!"
+build: format
+	@bun build bin/main.ts --outdir bin --target bun --minify
 
 push:
 	@echo "🚀 Running push.sh..."
@@ -49,3 +23,13 @@ lokio:
 # Format
 format:
 	@bun run format
+
+
+npm-release-patch:
+	@bun run helper/patch.ts && make build && npm publish && make push && git push
+
+npm-release-minor:
+	@bun run helper/minor.ts && make build && npm publish && make push && git push
+
+npm-release-major:
+	@bun run helper/major.ts && make build && npm publish && make push && git push

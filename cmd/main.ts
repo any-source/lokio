@@ -12,7 +12,7 @@ export const run = async () => {
 	try {
 		const program = new Command();
 		const { exist, data } = useReadConfig();
-		await ProgramInit(program);
+		await ProgramInit(program, exist);
 		if (!exist) {
 			clearContext();
 			await ProgramCreate(program);

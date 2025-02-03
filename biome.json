@@ -7,7 +7,7 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"ignore": []
+		"ignore": ["**/bin/**"]
 	},
 	"formatter": {
 		"enabled": true,
@@ -19,12 +19,40 @@
 	"linter": {
 		"enabled": true,
 		"rules": {
-			"recommended": true
+			"recommended": true,
+			"suspicious": {
+				"noExplicitAny": "error",
+				"noEmptyInterface": "error",
+				"noImplicitAnyLet": "error",
+				"noConsoleLog": "warn"
+			},
+			"complexity": {
+				"noForEach": "warn",
+				"noStaticOnlyClass": "warn",
+				"noUselessCatch": "error",
+				"useSimplifiedLogicExpression": "warn"
+			},
+			"style": {
+				"noNonNullAssertion": "warn",
+				"useShorthandArrayType": "error",
+				"useTemplate": "error"
+			},
+			"correctness": {
+				"noUnusedVariables": "error",
+				"noUndeclaredVariables": "error",
+				"noUnreachable": "error",
+				"useExhaustiveDependencies": "error",
+				"noUnusedImports": "error"
+			},
+			"performance": {
+				"noDelete": "warn"
+			}
 		}
 	},
 	"javascript": {
 		"formatter": {
-			"quoteStyle": "double"
+			"quoteStyle": "double",
+			"semicolons": "always"
 		}
 	}
 }

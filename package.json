@@ -1,6 +1,6 @@
 {
 	"name": "lokio-assistant",
-	"version": "0.0.4",
+	"version": "0.0.5",
 	"author": {
 		"name": "wahyu agus arifin",
 		"email": "itpohgero@gmail.com",
@@ -23,7 +23,7 @@
 		"biome:check": "bunx biome check --write .",
 		"biome:lint": "bunx biome lint --write ."
 	},
-	"files": ["bin", "cmd"],
+	"files": ["bin"],
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
 		"@types/bun": "^1.2.2"

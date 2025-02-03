@@ -54,15 +54,40 @@ class TemplateManager {
 		}
 	}
 
-	private async cleanDirectory(dir: string): Promise<void> {
+	private async deleteDirectory(dir: string): Promise<void> {
 		try {
-			await fs.rm(dir, { recursive: true, force: true }).catch(() => {});
+			const entries = await fs.readdir(dir, { withFileTypes: true });
+			for (const entry of entries) {
+				const entryPath = path.join(dir, entry.name);
+				if (entry.isDirectory()) {
+					await this.deleteDirectory(entryPath);
+				} else {
+					await fs.unlink(entryPath);
+				}
+			}
+			await fs.rmdir(dir);
 		} catch (error) {
-			log(
-				chalk.yellow(
-					`${TEXT.CLONE_PROJECT.DIR_CLEAN_FAILED} ${dir} : ${error}`,
-				),
-			);
+			log(chalk.yellow(`Failed to clean directory ${dir}: ${error}`));
+		}
+	}
+
+	private async copyDirectory(src: string, dest: string): Promise<void> {
+		try {
+			await fs.mkdir(dest, { recursive: true });
+			const entries = await fs.readdir(src, { withFileTypes: true });
+
+			for (const entry of entries) {
+				const srcPath = path.join(src, entry.name);
+				const destPath = path.join(dest, entry.name);
+
+				if (entry.isDirectory()) {
+					await this.copyDirectory(srcPath, destPath);
+				} else {
+					await fs.copyFile(srcPath, destPath);
+				}
+			}
+		} catch (error) {
+			throw new Error(`Failed to copy directory: ${(error as Error).message}`);
 		}
 	}
 
@@ -112,22 +137,22 @@ class TemplateManager {
 		const { tempDir, projectDir, templatePath } = this.paths;
 		try {
 			log(chalk.blue(TEXT.CLONE_PROJECT.START_SETUP));
-			await this.cleanDirectory(tempDir);
+			await this.deleteDirectory(tempDir);
 			await this.ensureDirectory(projectDir);
 
 			await getDirFromGithub(ENV.GUTHUB.LOKIO_TEMPLATE, tempDir);
-			await fs.cp(templatePath, projectDir, { recursive: true });
+			await this.copyDirectory(templatePath, projectDir);
 			log(chalk.green(TEXT.CLONE_PROJECT.TEMPLATE_COPIED));
 
 			await this.copyConfig();
 			await this.processLanguageSpecific();
 
-			await this.cleanDirectory(tempDir);
+			await this.deleteDirectory(tempDir);
 			log(chalk.green(TEXT.CLONE_PROJECT.SUCCESS(this.options.projectName)));
 		} catch (error) {
 			log(chalk.red(TEXT.CLONE_PROJECT.FAILURE));
 			log(chalk.red((error as Error).message));
-			await this.cleanDirectory(tempDir);
+			await this.deleteDirectory(tempDir);
 			throw error;
 		}
 	}

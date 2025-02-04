@@ -100,7 +100,6 @@ export const DEFAULT_MAPPINGS: Record<
 > = {
 	"next-monolith": [
 		{ value: FILE_TYPES.HOOK, label: "Hook" },
-		{ value: FILE_TYPES.SHARED, label: "Shared" },
 		{ value: FILE_TYPES.CALL, label: "Call" },
 		{ value: FILE_TYPES.COMPONENT, label: "Component" },
 		{ value: FILE_TYPES.SCREEN, label: "Screen" },
@@ -111,7 +110,6 @@ export const DEFAULT_MAPPINGS: Record<
 	],
 	"next-frontend": [
 		{ value: FILE_TYPES.HOOK, label: "Hook" },
-		{ value: FILE_TYPES.SHARED, label: "Shared" },
 		{ value: FILE_TYPES.CALL, label: "Call" },
 		{ value: FILE_TYPES.COMPONENT, label: "Component" },
 		{ value: FILE_TYPES.SCREEN, label: "Screen" },
@@ -119,7 +117,6 @@ export const DEFAULT_MAPPINGS: Record<
 	],
 	"astro-frontend": [
 		{ value: FILE_TYPES.HOOK, label: "Hook" },
-		{ value: FILE_TYPES.SHARED, label: "Shared" },
 		{ value: FILE_TYPES.CALL, label: "Call" },
 		{ value: FILE_TYPES.COMPONENT, label: "Component" },
 		{ value: FILE_TYPES.SCREEN, label: "Screen" },

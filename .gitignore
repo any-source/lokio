@@ -175,3 +175,6 @@ dist
 .DS_Store
 
 public/artifacts
+
+test/*
+exce/*

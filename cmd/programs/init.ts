@@ -43,6 +43,7 @@ export const ProgramInit = async (program: Command, exist = false) => {
 						...(exist ? notExistConfig : []),
 						...(!exist ? existConfig : []),
 						["info", TEXT.PROGRAM.HELP.INFO],
+						["update", TEXT.PROGRAM.HELP.UPDATE],
 						["--version", TEXT.PROGRAM.HELP.VERSION],
 					],
 				},

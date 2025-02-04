@@ -6,6 +6,7 @@ export const ENV = {
 	AUTHOR: pkg.author.name,
 	TAGLINE: "Structuring Code, One Command at a Time",
 	CONFIG_FILE_NAME: ".lokio.yaml",
+	LOKIO_REGISTRY: "https://registry.npmjs.org/lokio-assistant/latest",
 	GUTHUB: {
 		LOKIO_TEMPLATE: "https://github.com/any-source/examples/tarball/main",
 		LOKIO_GITHUB_URL:

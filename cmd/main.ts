@@ -7,6 +7,7 @@ import { ProgramCreate } from "./programs/create";
 import { ProgramInfo } from "./programs/info";
 import { ProgramInit } from "./programs/init";
 import { ProgramMake } from "./programs/make";
+import { ProgramUpdate } from "./programs/update";
 
 export const run = async () => {
 	try {
@@ -24,6 +25,7 @@ export const run = async () => {
 			await ProgramMake(program);
 		}
 
+		await ProgramUpdate(program);
 		await ProgramInfo(program);
 		program.parse(process.argv);
 	} catch (error) {

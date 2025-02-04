@@ -1,6 +1,6 @@
 {
 	"name": "lokio-assistant",
-	"version": "0.0.7",
+	"version": "0.0.8",
 	"author": {
 		"name": "wahyu agus arifin",
 		"email": "itpohgero@gmail.com",
@@ -34,8 +34,11 @@
 	"dependencies": {
 		"@bluwy/giget-core": "^0.1.2",
 		"@clack/prompts": "^0.9.1",
+		"@types/ejs": "^3.1.5",
+		"axios": "^1.7.9",
 		"chalk": "^5.4.1",
 		"commander": "^13.1.0",
+		"ejs": "^3.1.10",
 		"log-update": "^6.1.0",
 		"ora": "^8.1.1",
 		"yaml": "^2.7.0"

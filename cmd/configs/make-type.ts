@@ -101,7 +101,10 @@ export const FILE_TYPES = {
 	// KOTLIN
 	KT_FEATURE: "kt-feature",
 };
-const DEFAULT_MAPPINGS: Record<string, { value: string; label: string }[]> = {
+export const DEFAULT_MAPPINGS: Record<
+	string,
+	{ value: string; label: string }[]
+> = {
 	"next-monolith": [
 		{ value: FILE_TYPES.HOOK, label: "Hook" },
 		{ value: FILE_TYPES.SHARED, label: "Shared" },
@@ -133,7 +136,3 @@ const DEFAULT_MAPPINGS: Record<string, { value: string; label: string }[]> = {
 	"go-backend": [{ value: FILE_TYPES.GO_CONTROLLER, label: "Controller" }],
 	"kt-mobile": [{ value: FILE_TYPES.KT_FEATURE, label: "Feature" }],
 };
-
-export const FILE_TYPES_MAP_DIR = Object.fromEntries(
-	PROJECT_OPTIONS.map(({ value }) => [value, DEFAULT_MAPPINGS[value] || []]),
-);

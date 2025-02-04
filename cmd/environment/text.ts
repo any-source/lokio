@@ -17,6 +17,8 @@ export const TEXT = {
 		CREATE_DESCRIPTION: "Create a new project",
 		CANCELED: "Operation cancelled.",
 		INFORMATION: "Information",
+		UPDATE_VERSION: "Update to the latest version",
+		UPDATE_VERSION_SUCCESS: "Update to the latest version success",
 		HELP: {
 			CREATE: "(c) Create a new project",
 			MAKE: "(m) Create a pattern file for project",

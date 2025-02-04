@@ -7,7 +7,7 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"ignore": ["**/bin/**"]
+		"ignore": ["**/bin/**", "**/test/**"]
 	},
 	"formatter": {
 		"enabled": true,

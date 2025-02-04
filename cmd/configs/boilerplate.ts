@@ -44,7 +44,7 @@ export const BOILERPLATE_OPTIONS: BOILERPLATE_OPTIONS_TYPE[] = [
 				value: "hono-backend",
 				label: "[BE] - Hono Backend",
 				hint: "Lightning-fast backend for modern apps.",
-				status: false,
+				status: true,
 				lang: "ts",
 			},
 			{

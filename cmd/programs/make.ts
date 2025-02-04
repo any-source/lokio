@@ -67,7 +67,19 @@ export const ProgramMake = async (program: Command) => {
 						is_query: is_call,
 					});
 
-					// make schema
+					if (!is_call) {
+						await MakeFile({
+							named: file_name,
+							created_at: new Date().toISOString(),
+							file_name: fileName("schema"),
+							file_output_create: outputPath.schema,
+							file_folder_structure: folderStructure("schema"),
+							file_format: fileFormat("schema"),
+							ejs_file: "schema",
+							ejs_folder: EjsFolder(lang),
+							is_query: is_call,
+						});
+					}
 					return;
 				}
 				await MakeFile({

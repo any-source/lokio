@@ -1,12 +1,8 @@
 # Makefile
 
 # Output directory
-OUT_DIR=public/artifacts
-
-build: format
-	@bun build bin/main.ts --outdir bin --target bun --minify
-
-build-binary:
+build:
+	@rm -rf exce
 	@bun build --compile --minify --target=bun-linux-x64 bin/main.ts --outfile exce/linux
 	@upx --best --lzma exce/linux
 	@bun build --compile --minify --target=bun-darwin-arm64 bin/main.ts --outfile exce/mac
@@ -20,6 +16,9 @@ push:
 	@echo "🚀 Running push.sh..."
 	@chmod +x ./shell/push.sh
 	@./shell/push.sh
+
+build-js: format
+	@bun build bin/main.ts --outdir bin --target bun --minify
 
 fork:
 	@echo "🚀 Running fork.sh..."

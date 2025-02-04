@@ -23,7 +23,7 @@ export const TEXT = {
 			CREATE: "(c) Create a new project",
 			MAKE: "(m) Create a pattern file for project",
 			GENERATE: "(g) Generate Files that have been created by the community",
-			INFO: "(i) Show information about the project",
+			INFO: "(i) Show information about Lokio Assistant",
 			UPDATE: "(u) Update to the latest version",
 			VERSION: "(-v) Check the current version",
 		},

@@ -102,9 +102,7 @@ async function checkAndUpdateVersion(): Promise<boolean> {
 		log(chalk.dim(`With : ${packageManager.name} on ${os.platform()}`));
 
 		// Fetch the latest version from npm
-		const response = await axios.get(
-			`https://registry.npmjs.org/${ENV.NAME}/latest`,
-		);
+		const response = await axios.get(ENV.LOKIO_REGISTRY);
 		const latestVersion = response.data.version;
 
 		// Compare current version with latest version

@@ -51,7 +51,7 @@ export const BOILERPLATE_OPTIONS: BOILERPLATE_OPTIONS_TYPE[] = [
 				value: "elysia-backend",
 				label: "[BE] - Elysia Backend",
 				hint: "Elegant, modern, and developer-friendly.",
-				status: false,
+				status: true,
 				lang: "ts",
 			},
 		],

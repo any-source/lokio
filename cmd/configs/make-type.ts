@@ -1,17 +1,10 @@
-export type RESULTS_PROJECT_TYPE = {
-	value: string;
-	label: string;
-	hint?: string;
-	status?: boolean;
-	lang: string;
-};
 export type PROJECT_OPTIONS_TYPE = {
 	value: string;
 	label: string;
 	hint?: string;
 	status?: boolean;
 	lang?: string;
-	children?: RESULTS_PROJECT_TYPE[];
+	children?: PROJECT_OPTIONS_TYPE[];
 };
 export const PROJECT_OPTIONS: PROJECT_OPTIONS_TYPE[] = [
 	{

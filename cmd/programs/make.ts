@@ -1,9 +1,10 @@
-// import MakeFile from "@/command/make-file";
+import MakeFile from "@/command/make-file";
 import { CONTEXT_KEY } from "@/configs/context-key";
+import { fileFormat, fileName, folderStructure } from "@/configs/make-config";
 import { DEFAULT_MAPPINGS } from "@/configs/make-type";
 import { getContext } from "@/context/main";
 import { TEXT } from "@/environment/text";
-import { log } from "@/utils/util-use";
+import { EjsFolder, useGetLanguage } from "@/hooks/use_get_language";
 import { cancel, isCancel, select, text } from "@clack/prompts";
 import type { Command } from "commander";
 
@@ -19,11 +20,11 @@ export const ProgramMake = async (program: Command) => {
 			} | null;
 
 			const fileTypes = DEFAULT_MAPPINGS[name?.toString() as string] || [];
-			const type_file = (await select({
+			const ejs_file = (await select({
 				message: "What type of file do you want to create?",
 				options: fileTypes,
 			})) as string;
-			if (isCancel(type_file)) {
+			if (isCancel(ejs_file)) {
 				cancel(TEXT.PROGRAM.CANCELED);
 				process.exit(0);
 			}
@@ -39,19 +40,17 @@ export const ProgramMake = async (program: Command) => {
 			if (!outputPath) {
 				throw new Error("Output path is not defined");
 			}
-			// await MakeFile({
-			// 	output_file_created: outputPath[type_file],
-			// 	name: file_name,
-			// 	lang: "typescript",
-			// 	created_at: new Date().toISOString(),
-			// 	fileName: fileName(type_file),
-			// 	folderStructure: folderStructure(type_file),
-			// 	fileFormat: fileFormat(type_file),
-			// 	ejs_file: "call",
-			// });
-			log(JSON.stringify(fileTypes));
-			log(JSON.stringify(outputPath));
-			// log(JSON.stringify(type_file));
-			log(JSON.stringify(name));
+			const lang = useGetLanguage(name as string);
+			await MakeFile({
+				named: file_name,
+				created_at: new Date().toISOString(),
+				file_name: fileName(ejs_file),
+				file_output_create: outputPath[ejs_file],
+				file_folder_structure: folderStructure(ejs_file),
+				file_format: fileFormat(ejs_file),
+
+				ejs_file,
+				ejs_folder: EjsFolder(lang),
+			});
 		});
 };

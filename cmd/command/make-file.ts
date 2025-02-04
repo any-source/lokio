@@ -9,44 +9,44 @@ import { readFileFromGithub } from "@/hooks/use_github";
 import { log } from "@/utils/util-use";
 
 interface MakeFileProps {
-	output_file_created: string;
-	name: string;
+	file_output_create: string;
+	named: string;
 	created_at: string;
-	fileName: string;
-	folderStructure: string;
-	lang: string;
-	fileFormat: string;
+	file_name: string;
+	file_folder_structure: string;
+	file_format: string;
 	ejs_file: string;
+	ejs_folder: string;
 }
 
 /**
  * Enhanced MakeFile function that supports both local and GitHub-hosted templates
  */
 const MakeFile = async ({
-	output_file_created,
-	name,
+	file_output_create,
+	named,
 	created_at,
-	fileName,
-	folderStructure,
-	lang,
-	fileFormat,
+	file_name,
+	file_folder_structure,
+	file_format,
 	ejs_file,
+	ejs_folder,
 }: MakeFileProps) => {
 	try {
 		// 1. Get template content (either from local or GitHub)
 		const template = await readFileFromGithub(
-			`ejs.t/${lang}/${ejs_file}.ejs.t`,
+			`ejs.t/${ejs_folder}/${ejs_file}.ejs.t`,
 		);
 		// 2. Prepare template variables
 		const packageName = getContext(CONTEXT_KEY.CONFIGS.PACKAGE);
 		const templateVars = {
-			name: name.toLowerCase(),
-			Name: name.charAt(0).toUpperCase() + name.slice(1).toLowerCase(),
-			NAME: name.toUpperCase(),
+			name: named.toLowerCase(),
+			Name: named.charAt(0).toUpperCase() + named.slice(1).toLowerCase(),
+			NAME: named.toUpperCase(),
 			created_at,
-			fileName,
-			folderStructure,
-			fileFormat,
+			file_name,
+			file_folder_structure,
+			file_format,
 			package: packageName,
 		};
 
@@ -54,18 +54,22 @@ const MakeFile = async ({
 		const renderedContent = ejs.render(template, templateVars);
 
 		// 4. Resolve folder structure
-		const resolvedFolderStructure = replacePlaceholders(folderStructure, name);
+		const resolvedfileFolderStructure = replacePlaceholders(
+			file_folder_structure,
+			named,
+		);
 		const fullOutputPath = path.join(
-			output_file_created,
-			resolvedFolderStructure,
+			file_output_create,
+			resolvedfileFolderStructure,
 		);
 
 		// 5. Create directory
 		fs.mkdirSync(fullOutputPath, { recursive: true });
 
 		// 6. Resolve and create file
-		const resolvedFileName = replacePlaceholders(fileName, name) + fileFormat;
-		const finalFilePath = path.join(fullOutputPath, resolvedFileName);
+		const resolvedfile_name =
+			replacePlaceholders(file_name, named) + file_format;
+		const finalFilePath = path.join(fullOutputPath, resolvedfile_name);
 
 		// 7. Write file
 		fs.writeFileSync(finalFilePath, renderedContent, "utf-8");

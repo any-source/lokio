@@ -1,5 +1,8 @@
 # Makefile
 
+test: 
+	@bun build --minify bin/main.ts --outfile bin/main.js --target bun
+
 # Output directory
 build:
 	@rm -rf exce

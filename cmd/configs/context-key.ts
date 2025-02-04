@@ -8,5 +8,6 @@ export const CONTEXT_KEY = {
 		PACKAGE_NAME: "command_package_name",
 		BOILERPLATE: "command_boilerplate",
 		INSTALL_DEPENDENCY: "command_install_dependency",
+		IS_CALL: "command_is_call",
 	},
 };

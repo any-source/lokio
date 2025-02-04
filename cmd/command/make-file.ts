@@ -17,6 +17,7 @@ interface MakeFileProps {
 	file_format: string;
 	ejs_file: string;
 	ejs_folder: string;
+	is_query?: boolean;
 }
 
 /**
@@ -31,6 +32,7 @@ const MakeFile = async ({
 	file_format,
 	ejs_file,
 	ejs_folder,
+	is_query,
 }: MakeFileProps) => {
 	try {
 		// 1. Get template content (either from local or GitHub)
@@ -48,6 +50,7 @@ const MakeFile = async ({
 			file_folder_structure,
 			file_format,
 			package: packageName,
+			isQuery: is_query,
 		};
 
 		// 3. Render template

@@ -1,9 +1,11 @@
 # Makefile
 
 test: 
+	@rf -rf test/main.js
 	@bun build --minify bin/main.ts --outfile test/main.js --target bun
 	
 npm: 
+	@rf -rf bin/main.js
 	@bun build --minify bin/main.ts --outfile bin/main.js --target bun
 
 # Output directory

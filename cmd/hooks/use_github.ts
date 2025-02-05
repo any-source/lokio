@@ -1,32 +1,5 @@
-import fs from "node:fs/promises";
 import { ENV } from "@/environment/main";
-import { downloadTemplate } from "@bluwy/giget-core";
 import chalk from "chalk";
-
-/**
- * Download entire directory from GitHub
- * @param githubUrl - URL to the GitHub repository or directory
- * @param tempDir - Temporary directory to store the downloaded files
- */
-export async function getDirFromGithub(
-	githubUrl: string,
-	tempDir: string,
-): Promise<void> {
-	try {
-		await fs.mkdir(tempDir, { recursive: true });
-		await downloadTemplate(githubUrl, {
-			dir: tempDir,
-			force: true,
-		});
-	} catch (error) {
-		console.error(
-			chalk.red(
-				`❌ Failed to download directory from ${githubUrl}: ${(error as Error).message}`,
-			),
-		);
-		throw error;
-	}
-}
 
 /**
  * Read file content directly from GitHub using raw content URL

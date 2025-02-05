@@ -1,6 +1,6 @@
 # Makefile
 
-test: 
+npm: 
 	@bun build --minify bin/main.ts --outfile bin/main.js --target bun
 
 # Output directory
@@ -38,10 +38,10 @@ format:
 
 
 npm-release-patch:
-	@bun run helper/patch.ts && make build && npm publish && make push && git push
+	@bun run helper/patch.ts && make npm && npm publish && make push && git push
 
 npm-release-minor:
-	@bun run helper/minor.ts && make build && npm publish && make push && git push
+	@bun run helper/minor.ts && make npm && npm publish && make push && git push
 
 npm-release-major:
-	@bun run helper/major.ts && make build && npm publish && make push && git push
+	@bun run helper/major.ts && make npm && npm publish && make push && git push

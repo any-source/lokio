@@ -3,11 +3,13 @@ import { BOILERPLATE_OPTIONS } from "@/configs/boilerplate";
 export const EjsFolder = (lang: string): string => {
 	switch (lang) {
 		case "ts":
-			return "typescript";
+			return ".ts";
 		case "kt":
-			return "kotlin";
+			return ".kt";
 		case "go":
-			return "golang";
+			return ".go";
+		case "vue":
+			return ".vue";
 		default:
 			return "";
 	}

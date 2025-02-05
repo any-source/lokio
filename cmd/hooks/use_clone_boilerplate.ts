@@ -1,18 +1,13 @@
 import fs from "node:fs/promises";
-import path from "node:path";
-import { TEXT } from "@/environment/text";
-import { Github } from "@/github/readfile";
-import {
-	installDependenciesGolang,
-	processFilesGolang,
-} from "@/services/install/golang";
-import {
-	installDependenciesTypescript,
-	processFilesTypescript,
-} from "@/services/install/typescript";
-import { log } from "@/utils/util-use";
-import { downloadTemplate } from "@bluwy/giget-core";
+import path, {join} from "node:path";
+import {TEXT} from "@/environment/text";
+import {Github} from "@/github/readfile";
+import {installDependenciesGolang, processFilesGolang,} from "@/services/install/golang";
+import {installDependenciesTypescript, processFilesTypescript,} from "@/services/install/typescript";
+import {log} from "@/utils/util-use";
 import chalk from "chalk";
+import simpleGit from 'simple-git';
+import {readdirSync, renameSync, rmSync} from 'node:fs';
 
 export type SupportedLanguage = "ts" | "go" | "kt";
 
@@ -76,6 +71,42 @@ async function processLanguageSpecific(
 	await handlers[lang]();
 }
 
+// Temporary workaround using simple git
+const downloadTemplate1 = async (tmpl: string, projectName: string) => {
+	const repo = 'https://github.com/any-source/examples';
+	const templatePath = join('code', tmpl);
+
+	try {
+		await simpleGit().clone(repo, projectName, [
+			'--depth', '1',
+			'--branch', 'main',
+			'--sparse',
+			'--filter=blob:none'
+		]);
+
+		await simpleGit(projectName)
+			.raw(['sparse-checkout', 'set', templatePath]);
+
+		// Move template contents to root
+		const templateFullPath = join(projectName, templatePath);
+		const files = readdirSync(templateFullPath);
+		for (const file of files) {
+			renameSync(
+				join(templateFullPath, file),
+				join(projectName, file)
+			);
+		}
+
+		// Clean up
+		rmSync(join(projectName, 'code'), {recursive: true});
+		rmSync(join(projectName, '.git'), {recursive: true});
+
+		log('Template downloaded successfully');
+	} catch (error) {
+		console.error('Failed:', error);
+	}
+};
+
 export default async function copyTemplate(
 	options: TemplateOptions,
 ): Promise<void> {
@@ -87,11 +118,15 @@ export default async function copyTemplate(
 
 		// Download template using giget-core
 		// Format: owner/repo/subdir#ref
-		const templatePath = `any-source/examples/code/${tmpl}#main`;
-		await downloadTemplate(templatePath, {
-			dir: projectName,
-			force: true,
-		});
+		// const templatePath = `any-source/examples/code/${tmpl}#main`;
+		// const temptRes = await downloadTemplate(templatePath, {
+		// 	dir: projectName,
+		// 	force: true,
+		// 	cwd: "true"
+		// });
+
+		await downloadTemplate1(tmpl, projectName)
+
 		log(chalk.green(TEXT.CLONE_PROJECT.TEMPLATE_COPIED));
 
 		// Copy and update configuration

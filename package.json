@@ -1,6 +1,6 @@
 {
 	"name": "lokio",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"author": {
 		"name": "wahyu agus arifin",
 		"email": "itpohgero@gmail.com",
@@ -8,10 +8,10 @@
 	},
 	"license": "MIT",
 	"type": "module",
-	"main": "./bin/main.js",
+	"main": "./bin/boostrap.js",
 	"types": "./bin/main.d.ts",
 	"bin": {
-		"lokio": "./bin/main.js"
+		"lokio": "./bin/boostrap.js"
 	},
 	"engines": {
 		"node": ">=18.0.0",

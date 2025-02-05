@@ -1,7 +1,10 @@
 # Makefile
 
-npm: 
+test: 
 	@bun build --minify bin/main.ts --outfile bin/main.js --target bun
+	
+npm: 
+	@bun build --minify bin/main.ts --outfile bin/boostrap.js --target bun
 
 # Output directory
 build:

@@ -36,6 +36,41 @@ export const BOILERPLATE_OPTIONS: BOILERPLATE_OPTIONS_TYPE[] = [
 		],
 	},
 	{
+		value: "angular",
+		label: "Angular",
+		hint: "The future of frontend development.",
+		children: [
+			{
+				value: "angular-frontend",
+				label: "[FE] - Frontend Angular",
+				hint: "Cutting-edge frontend, simplified.",
+				status: true,
+				lang: "ts",
+			},
+		],
+	},
+	{
+		value: "vue",
+		label: "Vue",
+		hint: "The lightning-fast frontend framework",
+		children: [
+			{
+				value: "vue-frontend",
+				label: "[FE] - Frontend Vue",
+				hint: "Vue frontend for modern apps.",
+				status: true,
+				lang: "ts",
+			},
+			{
+				value: "nuxt-frontend",
+				label: "[FE] - Frontend Nuxt",
+				hint: "Nuxt frontend for modern apps.",
+				status: true,
+				lang: "ts",
+			},
+		],
+	},
+	{
 		value: "bun",
 		label: "Bun",
 		hint: "Modern, fast, all-in-one JS runtime.",

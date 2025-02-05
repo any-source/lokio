@@ -8,10 +8,10 @@
 	},
 	"license": "MIT",
 	"type": "module",
-	"main": "./bin/boostrap.js",
+	"main": "./bin/main.js",
 	"types": "./bin/main.d.ts",
 	"bin": {
-		"lokio": "./bin/boostrap.js"
+		"lokio": "./bin/main.js"
 	},
 	"engines": {
 		"node": ">=18.0.0",

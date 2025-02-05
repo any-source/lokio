@@ -1,4 +1,4 @@
-import { PROJECT_OPTIONS } from "@/configs/make-type";
+import { BOILERPLATE_OPTIONS } from "@/configs/boilerplate";
 
 export const EjsFolder = (lang: string): string => {
 	switch (lang) {
@@ -14,7 +14,7 @@ export const EjsFolder = (lang: string): string => {
 };
 
 export const useGetLanguage = (value: string): string => {
-	for (const project of PROJECT_OPTIONS) {
+	for (const project of BOILERPLATE_OPTIONS) {
 		if (project.value === value && project.lang) {
 			return project.lang;
 		}

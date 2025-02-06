@@ -1,5 +1,6 @@
 import { ENV } from "@/environment/main";
 import { TEXT } from "@/environment/text";
+import { Github } from "@/github/readfile";
 import { useReadConfig } from "@/hooks/use_config";
 import { Help } from "@/interfaces/help";
 import { say } from "@/interfaces/say";
@@ -8,9 +9,15 @@ import type { Command } from "commander";
 import { BoilerplateShowLabel } from "./../configs/boilerplate";
 
 export const ProgramInit = async (program: Command, exist = false) => {
+	const data = await Github();
+	const { major, minor, patch } = data.GITHUB_VERSION || {};
 	program
 		.name(ENV.NAME)
-		.version(ENV.VERSION, "-v, --version", TEXT.PROGRAM.VERSION_DESCRIPTION)
+		.version(
+			`${major}.${minor}.${patch}`,
+			"-v, --version",
+			TEXT.PROGRAM.VERSION_DESCRIPTION,
+		)
 		.action(async () => {
 			const x = useReadConfig();
 			await say(

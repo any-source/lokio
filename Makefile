@@ -1,53 +1,61 @@
-# Makefile
+# Nama aplikasi dan versi
+APP_NAME=lokio
+VERSION=0.0.2
+BINARY_PATH_MAC=store/brew/$(APP_NAME)
+TAR_FILE=store/brew/$(APP_NAME)-darwin-x64.tar.gz
+RB_FILE=store/brew_rb/$(APP_NAME).rb
+GITHUB_USER_AND_REPO=any-source/lokio
+GITHUB_SSH_LINK=git@github.com:any-source/lokio.git
 
-test: 
-	@rf -rf test/main.js
-	@bun build --minify bin/main.ts --outfile test/main.js --target bun
-	
-npm: 
-	@rf -rf bin/main.js
-	@bun build --minify bin/main.ts --outfile bin/main.js --target bun
+# 🚀 Build dan Package
+build: package-mac shasum brew-setup ## Build binary dan buat package tar.gz
 
-# Output directory
-build:
-	@rm -rf exce
-	@bun build --compile --minify --target=bun-linux-x64 bin/main.ts --outfile exce/linux
-	@upx --best --lzma exce/linux
-	@bun build --compile --minify --target=bun-darwin-arm64 bin/main.ts --outfile exce/mac
-	@bun build --compile --minify --target=bun-windows-x64 bin/main.ts --outfile exce/windows.exe
-	@upx --best --lzma exce/windows.exe
-	@sha256sum exce/windows.exe > exce/checksum.txt
+package-mac: ## Build binary dan buat file tar.gz
+	@echo "📦 Building binary untuk macOS..."
+	@mkdir -p store/brew
+	@bun build --compile --minify --target=bun-darwin-arm64 bin/main.ts --outfile $(BINARY_PATH_MAC)
+	@tar -czvf $(TAR_FILE) -C store/brew $(APP_NAME)
 
-size:
-	@du -sh exce/linux exce/mac exce/windows.exe
+shasum: ## Menghitung SHA256 dari binary
+	@echo "🔑 Menghitung SHA256 dari $(TAR_FILE)..."
+	@SHA256_HASH=$$(shasum -a 256 $(TAR_FILE) | awk '{ print $$1 }'); \
+	echo "SHA256: $$SHA256_HASH"; \
+	sed -i '' "s|sha256 ''|sha256 \"$$SHA256_HASH\"|" $(RB_FILE)
 
-push:
-	@echo "🚀 Running push.sh..."
-	@chmod +x ./shell/push.sh
-	@./shell/push.sh
+# 🏗️ Setup Homebrew Formula
+brew-setup: ## Membuat formula Homebrew
+	@echo "📝 Menyiapkan formula Homebrew..."
+	@mkdir -p store/brew
+	@SHA256_HASH=$$(shasum -a 256 $(TAR_FILE) | awk '{ print $$1 }'); \
+	echo "class $(APP_NAME) < Formula" > $(RB_FILE); \
+	echo "  desc 'Deskripsi aplikasi kamu'" >> $(RB_FILE); \
+	echo "  homepage 'https://github.com/$(GITHUB_USER_AND_REPO)'" >> $(RB_FILE); \
+	echo "  url 'https://github.com/$(GITHUB_USER_AND_REPO)/releases/download/$(VERSION)/$(APP_NAME)-darwin-x64.tar.gz'" >> $(RB_FILE); \
+	echo "  sha256 \"$$SHA256_HASH\"" >> $(RB_FILE); \
+	echo "" >> $(RB_FILE); \
+	echo "  def install" >> $(RB_FILE); \
+	echo "    bin.install '$(APP_NAME)'" >> $(RB_FILE); \
+	echo "  end" >> $(RB_FILE); \
+	echo "" >> $(RB_FILE); \
+	echo "  test do" >> $(RB_FILE); \
+	echo "    system \"\#{bin}/$(APP_NAME)\", '--version'" >> $(RB_FILE); \
+	echo "  end" >> $(RB_FILE); \
+	echo "end" >> $(RB_FILE)
 
-build-js: format
-	@bun build bin/main.ts --outdir bin --target bun --minify
+# 📤 Upload ke GitHub Releases
+brew-release: ## Upload tar.gz ke GitHub Releases
+	@echo "📤 Mengunggah rilis ke GitHub..."
+	@gh release create $(VERSION) $(TAR_FILE) --title "Release $(VERSION)" --notes "Rilis versi $(VERSION)"
 
-fork:
-	@echo "🚀 Running fork.sh..."
-	@chmod +x ./shell/fork.sh
-	@./shell/fork.sh
+# 🔄 Instalasi & Update
+brew-install: ## Install aplikasi dari Homebrew
+	brew tap $(GITHUB_USER_AND_REPO) $(GITHUB_SSH_LINK)
+	brew install $(APP_NAME)
 
-# Lokio init
-lokio:
-	@public/bin/lokio
+brew-update: ## Update aplikasi jika ada versi baru
+	brew update
+	brew upgrade $(APP_NAME)
 
-# Format
-format:
-	@bun run format
-
-
-npm-release-patch:
-	@bun run helper/patch.ts && make npm && npm publish && make push && git push
-
-npm-release-minor:
-	@bun run helper/minor.ts && make npm && npm publish && make push && git push
-
-npm-release-major:
-	@bun run helper/major.ts && make npm && npm publish && make push && git push
+# 📚 Help
+help: ## Menampilkan daftar perintah Makefile
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'

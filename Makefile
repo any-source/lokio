@@ -16,6 +16,7 @@ build:
 	@bun build --compile --minify --target=bun-darwin-arm64 bin/main.ts --outfile exce/mac
 	@bun build --compile --minify --target=bun-windows-x64 bin/main.ts --outfile exce/windows.exe
 	@upx --best --lzma exce/windows.exe
+	@sha256sum exce/windows.exe > exce/checksum.txt
 
 size:
 	@du -sh exce/linux exce/mac exce/windows.exe

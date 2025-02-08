@@ -1,6 +1,6 @@
 # Variabel
 NAME=lokio
-VERSION=1.0.0
+VERSION=1.0.1
 BUILD_DIR=build
 SRC_DIR=bin
 
@@ -94,3 +94,38 @@ release:
 		--notes "Release version $(VERSION)" \
 		--draft=false \
 		--prerelease=false
+
+push:
+	@echo "🚀 Running push.sh..."
+	@chmod +x ./shell/push.sh
+	@./shell/push.sh
+
+# Format
+format:
+	@bun run format
+
+build-js: format
+	@bun build bin/main.ts --outdir bin --target bun --minify  --target bun
+
+fork:
+	@echo "🚀 Running fork.sh..."
+	@chmod +x ./shell/fork.sh
+	@./shell/fork.sh
+
+npm-update-version-patch:
+	@bun run helper/patch.ts
+
+npm-publish-patch:
+	@make build-js && npm publish && make push && git push
+
+npm-update-version-minor:
+	@bun run helper/minor.ts
+
+npm-publish-minor:
+	@make build-js && npm publish && make push && git push
+
+npm-update-version-major:
+	@bun run helper/major.ts
+
+npm-publish-major:
+	@make build-js && npm publish && make push && git push

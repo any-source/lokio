@@ -22,7 +22,7 @@
 		"biome:format": "bunx biome format --write .",
 		"biome:check": "bunx biome check --write .",
 		"biome:lint": "bunx biome lint --write .",
-		"build": "bun build ./src/main.ts --compile --outfile=build/lokio"
+		"build": "bun build bin/main.ts --outdir bin --target bun --minify"
 	},
 	"files": ["bin"],
 	"devDependencies": {

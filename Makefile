@@ -104,9 +104,6 @@ push:
 format:
 	@bun run format
 
-build-js: format
-	@bun build bin/main.ts --outdir bin --target bun --minify  --target bun
-
 fork:
 	@echo "🚀 Running fork.sh..."
 	@chmod +x ./shell/fork.sh
@@ -116,16 +113,16 @@ npm-update-version-patch:
 	@bun run helper/patch.ts
 
 npm-publish-patch:
-	@make build-js && npm publish && make push && git push
+	@bun run build && npm publish && make push && git push
 
 npm-update-version-minor:
 	@bun run helper/minor.ts
 
 npm-publish-minor:
-	@make build-js && npm publish && make push && git push
+	@bun run build && npm publish && make push && git push
 
 npm-update-version-major:
 	@bun run helper/major.ts
 
 npm-publish-major:
-	@make build-js && npm publish && make push && git push
+	@bun run build && npm publish && make push && git push

@@ -18,10 +18,13 @@ export type BOILERPLATE_OPTIONS_TYPE = {
 
 export const BOILERPLATE = async (): Promise<BOILERPLATE_OPTIONS_TYPE[]> => {
 	const data = await Github();
-	return data.BOILERPLATE_YAML || []
-}
+	return data.BOILERPLATE_YAML || [];
+};
 
-export const BoilerplateShowLabel = (BOILERPLATE_OPTIONS: BOILERPLATE_OPTIONS_TYPE[], value: string): string => {
+export const BoilerplateShowLabel = (
+	BOILERPLATE_OPTIONS: BOILERPLATE_OPTIONS_TYPE[],
+	value: string,
+): string => {
 	const findLabel = (
 		options: BOILERPLATE_OPTIONS_TYPE[],
 	): string | undefined => {

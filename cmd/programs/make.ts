@@ -18,14 +18,17 @@ export const ProgramMake = async (program: Command) => {
 			const name = getContext(CONTEXT_KEY.CONFIGS.NAME);
 			const outputPath = getContext(CONTEXT_KEY.CONFIGS.DIR) as {
 				[key: string]: string;
-			} | null;			
+			} | null;
 
 			const data = await Github();
-			if (!(data?.MAKE_YAML)) {
+			if (!data?.MAKE_YAML) {
 				throw new Error("Data MAKE_YAML tidak ditemukan.");
 			}
-			const parsedYAML = typeof data.MAKE_YAML === "string" ? JSON.parse(data.MAKE_YAML) : data.MAKE_YAML;
-			const fileTypes = name ? parsedYAML[name.toString()] ?? [] : [];			
+			const parsedYAML =
+				typeof data.MAKE_YAML === "string"
+					? JSON.parse(data.MAKE_YAML)
+					: data.MAKE_YAML;
+			const fileTypes = name ? (parsedYAML[name.toString()] ?? []) : [];
 
 			const ejs_file = (await select({
 				message: "What type of file do you want to create?",
@@ -64,10 +67,10 @@ export const ProgramMake = async (program: Command) => {
 					await MakeFile({
 						named: file_name,
 						created_at: new Date().toISOString(),
-						file_name: fileName(ejs_file),
+						file_name: await fileName(ejs_file),
 						file_output_create: outputPath[ejs_file],
-						file_folder_structure: folderStructure(ejs_file),
-						file_format: fileFormat(ejs_file),
+						file_folder_structure: await folderStructure(ejs_file),
+						file_format: await fileFormat(ejs_file),
 						ejs_file,
 						ejs_folder: ejst,
 						is_query,
@@ -77,10 +80,10 @@ export const ProgramMake = async (program: Command) => {
 						await MakeFile({
 							named: file_name,
 							created_at: new Date().toISOString(),
-							file_name: fileName("schema"),
+							file_name: await fileName("schema"),
 							file_output_create: outputPath.schema,
-							file_folder_structure: folderStructure("schema"),
-							file_format: fileFormat("schema"),
+							file_folder_structure: await folderStructure("schema"),
+							file_format: await fileFormat("schema"),
 							ejs_file: "schema",
 							ejs_folder: ejst,
 							is_query,
@@ -91,10 +94,10 @@ export const ProgramMake = async (program: Command) => {
 				await MakeFile({
 					named: file_name,
 					created_at: new Date().toISOString(),
-					file_name: fileName(ejs_file),
+					file_name: await fileName(ejs_file),
 					file_output_create: outputPath[ejs_file],
-					file_folder_structure: folderStructure(ejs_file),
-					file_format: fileFormat(ejs_file),
+					file_folder_structure: await folderStructure(ejs_file),
+					file_format: await fileFormat(ejs_file),
 
 					ejs_file,
 					ejs_folder: ejst,

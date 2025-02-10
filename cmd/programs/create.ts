@@ -16,12 +16,12 @@ export const ProgramCreate = async (program: Command) => {
 			const pkg_name = await CommandProjectName();
 			const tmp = await CommandChooseBoilerplate();
 			const dep = await CommandInstallDependencies();
-			const lang = tmp.lang as SupportedLanguage;
+			const ejst = tmp.ejst as SupportedLanguage;
 			await copyTemplate({
 				install: dep,
 				projectName: pkg_name,
 				tmpl: tmp.value,
-				lang,
+				ejst,
 			});
 		});
 };

@@ -1,3 +1,4 @@
+import { BOILERPLATE, BoilerplateShowLabel } from "@/configs/boilerplate";
 import { ENV } from "@/environment/main";
 import { TEXT } from "@/environment/text";
 import { Github } from "@/github/readfile";
@@ -6,7 +7,6 @@ import { Help } from "@/interfaces/help";
 import { say } from "@/interfaces/say";
 import chalk from "chalk";
 import type { Command } from "commander";
-import { BoilerplateShowLabel } from "./../configs/boilerplate";
 
 export const ProgramInit = async (program: Command, exist = false) => {
 	const data = await Github();
@@ -24,7 +24,7 @@ export const ProgramInit = async (program: Command, exist = false) => {
 				[
 					[
 						TEXT.PROGRAM.SAY.INIT.STEP1,
-						BoilerplateShowLabel(x.data.name as string),
+						BoilerplateShowLabel(await BOILERPLATE(), x.data.name as string),
 					],
 					TEXT.PROGRAM.SAY.INIT.STEP2,
 				] as string[],

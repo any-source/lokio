@@ -16,13 +16,13 @@ import { log } from "@/utils/util-use";
 import chalk from "chalk";
 import simpleGit from "simple-git";
 
-export type SupportedLanguage = "ts" | "go" | "kt";
+export type SupportedLanguage = ".ts" | ".kt" | ".go" | ".vue" | ".js";
 
 interface TemplateOptions {
 	tmpl: string;
 	projectName: string;
 	install: boolean;
-	lang: SupportedLanguage;
+	ejst: SupportedLanguage;
 }
 
 async function ensureDirectory(dir: string): Promise<void> {
@@ -58,7 +58,7 @@ async function copyConfig(tmpl: string, projectName: string): Promise<void> {
 }
 
 async function processLanguageSpecific(
-	lang: SupportedLanguage,
+	ejst: SupportedLanguage,
 	projectDir: string,
 	projectName: string,
 	install: boolean,
@@ -75,7 +75,7 @@ async function processLanguageSpecific(
 		kt: async () => {},
 	};
 
-	await handlers[lang]();
+	await handlers[ejst.slice(1) as keyof typeof handlers]();
 }
 
 const downloadTemplate = async (tmpl: string, projectName: string) => {
@@ -108,7 +108,7 @@ const downloadTemplate = async (tmpl: string, projectName: string) => {
 export default async function copyTemplate(
 	options: TemplateOptions,
 ): Promise<void> {
-	const { tmpl, projectName, lang, install } = options;
+	const { tmpl, projectName, ejst, install } = options;
 
 	try {
 		log(chalk.blue(TEXT.CLONE_PROJECT.START_SETUP));
@@ -122,7 +122,7 @@ export default async function copyTemplate(
 		await copyConfig(tmpl, projectName);
 
 		// Process language-specific files
-		await processLanguageSpecific(lang, projectName, projectName, install);
+		await processLanguageSpecific(ejst, projectName, projectName, install);
 
 		log(chalk.green(TEXT.CLONE_PROJECT.SUCCESS(projectName)));
 	} catch (error) {

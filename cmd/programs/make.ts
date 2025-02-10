@@ -4,7 +4,7 @@ import { fileFormat, fileName, folderStructure } from "@/configs/make-config";
 import { DEFAULT_MAPPINGS, FILE_TYPES } from "@/configs/make-type";
 import { getContext } from "@/context/main";
 import { TEXT } from "@/environment/text";
-import { EjsFolder, useGetLanguage } from "@/hooks/use_get_language";
+import { useGetEjst } from "@/hooks/use_ejst";
 import { log } from "@/utils/util-use";
 import { cancel, isCancel, select, text } from "@clack/prompts";
 import type { Command } from "commander";
@@ -41,7 +41,7 @@ export const ProgramMake = async (program: Command) => {
 			if (!outputPath) {
 				throw new Error("Output path is not defined");
 			}
-			const lang = useGetLanguage(name as string);
+			const ejst = await useGetEjst(name as string);
 			try {
 				if (ejs_file === FILE_TYPES.CALL) {
 					const is_call = (await select({
@@ -63,7 +63,7 @@ export const ProgramMake = async (program: Command) => {
 						file_folder_structure: folderStructure(ejs_file),
 						file_format: fileFormat(ejs_file),
 						ejs_file,
-						ejs_folder: EjsFolder(lang),
+						ejs_folder: ejst,
 						is_query: is_call,
 					});
 
@@ -76,7 +76,7 @@ export const ProgramMake = async (program: Command) => {
 							file_folder_structure: folderStructure("schema"),
 							file_format: fileFormat("schema"),
 							ejs_file: "schema",
-							ejs_folder: EjsFolder(lang),
+							ejs_folder: ejst,
 							is_query: is_call,
 						});
 					}
@@ -91,7 +91,7 @@ export const ProgramMake = async (program: Command) => {
 					file_format: fileFormat(ejs_file),
 
 					ejs_file,
-					ejs_folder: EjsFolder(lang),
+					ejs_folder: ejst,
 				});
 			} catch (error) {
 				log(JSON.stringify(error));

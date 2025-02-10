@@ -1,5 +1,5 @@
 import {
-	BOILERPLATE_OPTIONS,
+	BOILERPLATE,
 	type BOILERPLATE_OPTIONS_TYPE,
 } from "@/configs/boilerplate";
 import { CONTEXT_KEY } from "@/configs/context-key";
@@ -14,7 +14,7 @@ import color from "chalk";
 
 export const CommandChooseBoilerplate =
 	async (): Promise<BOILERPLATE_OPTIONS_TYPE> => {
-		const selectedTemplate = await SelectBoilerplate(BOILERPLATE_OPTIONS);
+		const selectedTemplate = await SelectBoilerplate(await BOILERPLATE());
 		if (!selectedTemplate) {
 			cancel(TEXT.PROGRAM.CANCELED);
 			process.exit(0);

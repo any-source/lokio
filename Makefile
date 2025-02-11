@@ -1,6 +1,6 @@
 # Variabel
 NAME=lokio
-VERSION=1.0.4
+VERSION=1.0.5
 BUILD_DIR=build
 SRC_DIR=bin
 

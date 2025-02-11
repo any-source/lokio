@@ -35,7 +35,7 @@ export const Github = async (): Promise<GithubTypeResults> => {
 			]);
 
 		const GITHUB_VERSION: GithubTypeResults["GITHUB_VERSION"] =
-		YAML.parse(versionRaw);
+			YAML.parse(versionRaw);
 		const BOILERPLATE_YAML: GithubTypeResults["BOILERPLATE_YAML"] =
 			YAML.parse(boilerplateRaw);
 		const MAKE_YAML: GithubTypeResults["MAKE_YAML"] = YAML.parse(makeRaw);

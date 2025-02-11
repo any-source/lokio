@@ -27,7 +27,7 @@ export const Github = async (): Promise<GithubTypeResults> => {
 	try {
 		const [versionRaw, boilerplateRaw, makeRaw, makeConfigRaw, markdownInfo] =
 			await Promise.all([
-				readFileFromGithub("version.json"),
+				readFileFromGithub("cli/version.yaml"),
 				readFileFromGithub("cli/code.yaml"),
 				readFileFromGithub("cli/make.yaml"),
 				readFileFromGithub("cli/make-config.yaml"),
@@ -35,7 +35,7 @@ export const Github = async (): Promise<GithubTypeResults> => {
 			]);
 
 		const GITHUB_VERSION: GithubTypeResults["GITHUB_VERSION"] =
-			JSON.parse(versionRaw);
+		YAML.parse(versionRaw);
 		const BOILERPLATE_YAML: GithubTypeResults["BOILERPLATE_YAML"] =
 			YAML.parse(boilerplateRaw);
 		const MAKE_YAML: GithubTypeResults["MAKE_YAML"] = YAML.parse(makeRaw);

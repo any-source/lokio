@@ -1,31 +1,14 @@
+import YAML from 'yaml';
 import { exec } from "node:child_process";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { info } from "@/interfaces/info";
 import chalk from "chalk";
 import ora from "ora";
-
-interface FileUpdateOptions {
-	name: string;
-}
-
-type FileUpdater = (file: string, options: FileUpdateOptions) => Promise<void>;
-
-interface ProjectConfig {
-	filesToRemove: string[];
-	fileUpdaters: Record<string, FileUpdater>;
-}
-
-const PROJECT_CONFIG: ProjectConfig = {
-	filesToRemove: ["CHANGELOG.md", ".codesandbox", "go.sum"],
-	fileUpdaters: {
-		"go.mod": async (file: string, { name }: FileUpdateOptions) => {
-			const content = await fs.readFile(file, "utf-8");
-			const updatedContent = content.replace(/module\s+.+/, `module ${name}`);
-			await fs.writeFile(file, updatedContent, "utf-8");
-		},
-	},
-};
+import { readFileFromGithub } from "@/hooks/use_github";
+import { getContext } from "@/context/main";
+import { CONTEXT_KEY } from "@/configs/context-key";
+import { log } from '@/utils/util-use';
 
 class GolangProjectProcessor {
 	private readonly projectDir: string;
@@ -75,7 +58,14 @@ class GolangProjectProcessor {
 	}
 
 	private async removeFiles(): Promise<void> {
-		const removePromises = PROJECT_CONFIG.filesToRemove.map(async (file) => {
+		const PKG_NAME = getContext(CONTEXT_KEY.COMMAND.BOILERPLATE);
+		if (PKG_NAME === null) {
+			throw new Error("PKG_NAME is null");
+		}
+		const pkgNameValue = typeof PKG_NAME === 'object' && 'value' in PKG_NAME ? PKG_NAME.value : PKG_NAME;
+		const file = await readFileFromGithub(`package/${pkgNameValue}.yaml`)
+		const results = YAML.parse(file)?.files_remove
+		const removePromises = results?.map(async (file: string) => {
 			const filePath = path.resolve(this.projectDir, file);
 			try {
 				await fs.rm(filePath, { recursive: true, force: true });
@@ -90,28 +80,60 @@ class GolangProjectProcessor {
 	}
 
 	private async updateFiles(): Promise<void> {
-		const updatePromises = Object.entries(PROJECT_CONFIG.fileUpdaters).map(
-			async ([file, updater]) => {
-				const filePath = path.resolve(this.projectDir, file);
-				try {
-					const exists = await fs
-						.access(filePath)
-						.then(() => true)
-						.catch(() => false);
-
-					if (exists) {
-						await updater(filePath, { name: this.projectName });
-					}
-				} catch (error) {
-					throw new Error(
-						`Failed to update ${file}: ${(error as Error).message}`,
-					);
+		const PKG_NAME = getContext(CONTEXT_KEY.COMMAND.BOILERPLATE);
+		if (PKG_NAME === null) {
+			throw new Error("PKG_NAME is null");
+		}
+	
+		const pkgNameValue = typeof PKG_NAME === "object" && "value" in PKG_NAME ? PKG_NAME.value : PKG_NAME;
+		const file = await readFileFromGithub(`package/${pkgNameValue}.yaml`);
+		const yamlConfig = YAML.parse(file);
+		const filesReplacePackage = yamlConfig?.files_replace_package;
+	
+		if (!filesReplacePackage || typeof filesReplacePackage !== 'object') {
+			throw new Error("Invalid or missing files_replace_package in YAML");
+		}
+	
+		const updatePromises = Object.entries(filesReplacePackage).map(async ([filePath, config]) => {
+			if (!config || typeof config !== 'object' || !('patterns' in config) || !Array.isArray(config.patterns)) {
+				throw new Error(`Invalid configuration for file: ${filePath}`);
+			}
+	
+			const fullPath = path.resolve(this.projectDir, filePath);
+			
+			try {
+				const exists = await fs
+					.access(fullPath)
+					.then(() => true)
+					.catch(() => false);
+	
+				if (!exists) {
+					console.warn(`File not found: ${fullPath}`);
+					return;
 				}
-			},
-		);
-
+	
+				let content = await fs.readFile(fullPath, "utf-8");
+	
+				for (const pattern of config.patterns) {
+					if (!(pattern.regex && pattern.replace)) {
+						throw new Error(`Invalid pattern configuration for file: ${filePath}`);
+					}
+	
+					const compiledRegex = new RegExp(pattern.regex, "g");
+					const replacedString = pattern.replace.replace("${name}", this.projectName);
+					content = content.replace(compiledRegex, replacedString);
+				}
+	
+				await fs.writeFile(fullPath, content, "utf-8");
+				log(`Successfully updated: ${filePath}`);
+			} catch (error) {
+				throw new Error(`Failed to update ${filePath}: ${(error as Error).message}`);
+			}
+		});
+	
 		await Promise.all(updatePromises);
 	}
+
 
 	public async installDependencies(): Promise<void> {
 		try {

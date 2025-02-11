@@ -9,30 +9,30 @@ export type GithubTypeResults = {
 	GITHUB_VERSION: { major: number; minor: number; patch: number } | undefined;
 	BOILERPLATE_YAML: BOILERPLATE_OPTIONS_TYPE[] | undefined;
 	MAKE_YAML: Record<string, { label: string; value: string }[]> | undefined;
-	MAKECONFIG_YAML: Record<string, {
-		DEFAULT: string;
-		description: string;
-		extension: string;
-		file_name: string;
-		folder_name: string;
-	}> | undefined
+	MAKECONFIG_YAML:
+		| Record<
+				string,
+				{
+					DEFAULT: string;
+					description: string;
+					extension: string;
+					file_name: string;
+					folder_name: string;
+				}
+		  >
+		| undefined;
 };
 
 export const Github = async (): Promise<GithubTypeResults> => {
 	try {
-		const [
-			versionRaw,
-			boilerplateRaw,
-			makeRaw,
-			makeConfigRaw,
-			markdownInfo,
-		] = await Promise.all([
-			readFileFromGithub("version.json"),
-			readFileFromGithub("cli/code.yaml"),
-			readFileFromGithub("cli/make.yaml"),
-			readFileFromGithub("cli/make-config.yaml"),
-			readFileFromGithub("markdown/info.md"),
-		]);
+		const [versionRaw, boilerplateRaw, makeRaw, makeConfigRaw, markdownInfo] =
+			await Promise.all([
+				readFileFromGithub("version.json"),
+				readFileFromGithub("cli/code.yaml"),
+				readFileFromGithub("cli/make.yaml"),
+				readFileFromGithub("cli/make-config.yaml"),
+				readFileFromGithub("markdown/info.md"),
+			]);
 
 		const GITHUB_VERSION: GithubTypeResults["GITHUB_VERSION"] =
 			JSON.parse(versionRaw);
@@ -51,7 +51,7 @@ export const Github = async (): Promise<GithubTypeResults> => {
 			GITHUB_VERSION,
 			BOILERPLATE_YAML,
 			MAKE_YAML,
-			MAKECONFIG_YAML
+			MAKECONFIG_YAML,
 		};
 	} catch (error) {
 		log(error instanceof Error ? error.message : String(error));

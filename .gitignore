@@ -182,3 +182,5 @@ exce/*
 store/brew/*
 
 build
+
+bin/test*

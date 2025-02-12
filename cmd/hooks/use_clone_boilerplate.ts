@@ -4,10 +4,20 @@ import path, { join } from "node:path";
 import { ENV } from "@/environment/main";
 import { TEXT } from "@/environment/text";
 import { Github } from "@/github/readfile";
+import { execCommand } from "@/services/exect-command";
+import {
+	installDependenciesDart,
+	processFilesDart,
+} from "@/services/install/dart";
 import {
 	installDependenciesGolang,
 	processFilesGolang,
 } from "@/services/install/golang";
+import { processFilesKotlin } from "@/services/install/kotlin";
+import {
+	installDependenciesRust,
+	processFilesRust,
+} from "@/services/install/rust";
 import {
 	installDependenciesTypescript,
 	processFilesTypescript,
@@ -16,7 +26,14 @@ import { log } from "@/utils/util-use";
 import chalk from "chalk";
 import simpleGit from "simple-git";
 
-export type SupportedLanguage = ".ts" | ".kt" | ".go" | ".vue" | ".js";
+export type SupportedLanguage =
+	| ".ts"
+	| ".kt"
+	| ".go"
+	| ".vue"
+	| ".js"
+	| ".rust"
+	| ".java";
 
 interface TemplateOptions {
 	tmpl: string;
@@ -64,7 +81,15 @@ async function processLanguageSpecific(
 	install: boolean,
 ): Promise<void> {
 	const handlers = {
+		js: async () => {
+			await processFilesTypescript(projectDir, projectName);
+			if (install) await installDependenciesTypescript(projectDir);
+		},
 		ts: async () => {
+			await processFilesTypescript(projectDir, projectName);
+			if (install) await installDependenciesTypescript(projectDir);
+		},
+		vue: async () => {
 			await processFilesTypescript(projectDir, projectName);
 			if (install) await installDependenciesTypescript(projectDir);
 		},
@@ -72,7 +97,20 @@ async function processLanguageSpecific(
 			await processFilesGolang(projectDir, projectName);
 			if (install) await installDependenciesGolang(projectDir);
 		},
-		kt: async () => {},
+		kt: async () => {
+			await processFilesKotlin(projectDir, projectName);
+		},
+		java: async () => {
+			await processFilesKotlin(projectDir, projectName);
+		},
+		dart: async () => {
+			if (install) await installDependenciesDart(projectDir);
+			await processFilesDart(projectDir, projectName);
+		},
+		rust: async () => {
+			if (install) await installDependenciesRust(projectDir);
+			await processFilesRust(projectDir, projectName);
+		},
 	};
 
 	await handlers[ejst.slice(1) as keyof typeof handlers]();
@@ -124,6 +162,11 @@ export default async function copyTemplate(
 		// Process language-specific files
 		await processLanguageSpecific(ejst, projectName, projectName, install);
 
+		await execCommand(
+			"git init",
+			"Initializing git repository...",
+			projectName,
+		);
 		log(chalk.green(TEXT.CLONE_PROJECT.SUCCESS(projectName)));
 	} catch (error) {
 		log(chalk.red(TEXT.CLONE_PROJECT.FAILURE));

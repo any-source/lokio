@@ -1,7 +1,6 @@
 import { BOILERPLATE, BoilerplateShowLabel } from "@/configs/boilerplate";
 import { ENV } from "@/environment/main";
 import { TEXT } from "@/environment/text";
-import { Github } from "@/github/readfile";
 import { useReadConfig } from "@/hooks/use_config";
 import { Help } from "@/interfaces/help";
 import { say } from "@/interfaces/say";
@@ -9,12 +8,10 @@ import chalk from "chalk";
 import type { Command } from "commander";
 
 export const ProgramInit = async (program: Command, exist = false) => {
-	const data = await Github();
-	const { major, minor, patch } = data.GITHUB_VERSION || {};
 	program
 		.name(ENV.NAME)
 		.version(
-			`${major}.${minor}.${patch}`,
+			`${ENV.VERSION}`,
 			"-v, --version",
 			TEXT.PROGRAM.VERSION_DESCRIPTION,
 		)
@@ -50,7 +47,6 @@ export const ProgramInit = async (program: Command, exist = false) => {
 						...(exist ? notExistConfig : []),
 						...(!exist ? existConfig : []),
 						["info", TEXT.PROGRAM.HELP.INFO],
-						["update", TEXT.PROGRAM.HELP.UPDATE],
 						["--version", TEXT.PROGRAM.HELP.VERSION],
 					],
 				},

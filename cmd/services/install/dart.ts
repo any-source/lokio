@@ -1,22 +1,22 @@
 import { execCommand } from "../exect-command";
 import { removeFiles, updateFiles } from "../update-remove-files";
 
-export const installDependenciesGolang = async (
+export const installDependenciesDart = async (
 	projectDir: string,
 ): Promise<void> => {
 	try {
 		await execCommand(
-			"go mod tidy",
-			"Wait a moment, installing Go dependencies...",
+			"dart pub get",
+			"Wait a moment, installing Dart dependencies...",
 			projectDir,
 		);
 	} catch (error) {
 		throw new Error(
-			`Failed to install Go dependencies: ${(error as Error).message}`,
+			`Failed to install Dart dependencies: ${(error as Error).message}`,
 		);
 	}
 };
-export const processFilesGolang = async (
+export const processFilesDart = async (
 	projectDir: string,
 	projectName: string,
 ): Promise<void> => {
@@ -25,7 +25,7 @@ export const processFilesGolang = async (
 		await updateFiles(projectDir, projectName);
 	} catch (error) {
 		throw new Error(
-			`Failed to process Go project files: ${(error as Error).message}`,
+			`Failed to process Dart project files: ${(error as Error).message}`,
 		);
 	}
 };

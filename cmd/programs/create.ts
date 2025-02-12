@@ -15,8 +15,11 @@ export const ProgramCreate = async (program: Command) => {
 		.action(async () => {
 			const pkg_name = await CommandProjectName();
 			const tmp = await CommandChooseBoilerplate();
-			const dep = await CommandInstallDependencies();
 			const ejst = tmp.ejst as SupportedLanguage;
+			let dep = false;
+			if ([".js", ".ts", ".vue", ".go"].includes(ejst)) {
+				dep = await CommandInstallDependencies();
+			}
 			await copyTemplate({
 				install: dep,
 				projectName: pkg_name,

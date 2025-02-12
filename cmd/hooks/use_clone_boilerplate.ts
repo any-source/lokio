@@ -18,7 +18,7 @@ import simpleGit from "simple-git";
 import { processFilesKotlin } from "@/services/install/kotlin";
 import { processFilesDart } from "@/services/install/dart";
 
-export type SupportedLanguage = ".ts" | ".kt" | ".go" | ".vue" | ".js" | ".dart";
+export type SupportedLanguage = ".ts" | ".kt" | ".go" | ".vue" | ".js" | ".rust" | ".java";
 
 interface TemplateOptions {
 	tmpl: string;
@@ -85,7 +85,13 @@ async function processLanguageSpecific(
 		kt: async () => {
 			await processFilesKotlin(projectDir, projectName);
 		},
+		java: async () => {
+			await processFilesKotlin(projectDir, projectName);
+		},
 		dart: async () => {
+			await processFilesDart(projectDir, projectName);
+		},
+		rust: async () => {
 			await processFilesDart(projectDir, projectName);
 		},
 	};

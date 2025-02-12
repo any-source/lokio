@@ -1,54 +1,55 @@
-
+import { log } from "@/utils/util-use";
 import { select } from "@clack/prompts";
 import { execCommand } from "../exect-command";
 import { removeFiles, updateFiles } from "../update-remove-files";
 
-export const installDependenciesTypescript = async (projectDir: string): Promise<void> => {
+export const installDependenciesTypescript = async (
+	projectDir: string,
+): Promise<void> => {
 	try {
-		const command = await select({
+		const command = (await select({
 			message: "Select package manager",
 			initialValue: "bun install",
 			options: [
 				{
 					label: "bun",
 					value: "bun install",
-					hint: "Recomended"
+					hint: "Recomended",
 				},
 				{
 					label: "yarn",
-					value: "yarn install"
+					value: "yarn install",
 				},
 				{
 					label: "npm",
-					value: "npm install"
+					value: "npm install",
 				},
 				{
 					label: "pnpm",
-					value: "pnpm install"
+					value: "pnpm install",
 				},
-			]
-		}) as string;
+			],
+		})) as string;
 		await execCommand(
 			command,
 			`Wait a moment, installing dependencies... ${command}`,
-			projectDir
+			projectDir,
 		);
 	} catch (error) {
-		throw new Error(
-			`Failed to install Ts dependencies: ${(error as Error).message}`
-		);
+		log(`✖ ${(error as Error).message}`);
+		return;
 	}
 };
 export const processFilesTypescript = async (
 	projectDir: string,
-	projectName: string
+	projectName: string,
 ): Promise<void> => {
 	try {
 		await removeFiles(projectDir);
 		await updateFiles(projectDir, projectName);
 	} catch (error) {
 		throw new Error(
-			`Failed to process Ts project files: ${(error as Error).message}`
+			`Failed to process Ts project files: ${(error as Error).message}`,
 		);
 	}
 };

@@ -4,10 +4,20 @@ import path, { join } from "node:path";
 import { ENV } from "@/environment/main";
 import { TEXT } from "@/environment/text";
 import { Github } from "@/github/readfile";
+import { execCommand } from "@/services/exect-command";
+import {
+	installDependenciesDart,
+	processFilesDart,
+} from "@/services/install/dart";
 import {
 	installDependenciesGolang,
 	processFilesGolang,
 } from "@/services/install/golang";
+import { processFilesKotlin } from "@/services/install/kotlin";
+import {
+	installDependenciesRust,
+	processFilesRust,
+} from "@/services/install/rust";
 import {
 	installDependenciesTypescript,
 	processFilesTypescript,
@@ -15,12 +25,15 @@ import {
 import { log } from "@/utils/util-use";
 import chalk from "chalk";
 import simpleGit from "simple-git";
-import { processFilesKotlin } from "@/services/install/kotlin";
-import { installDependenciesDart, processFilesDart } from "@/services/install/dart";
-import { execCommand } from "@/services/exect-command";
-import { installDependenciesRust, processFilesRust } from "@/services/install/rust";
 
-export type SupportedLanguage = ".ts" | ".kt" | ".go" | ".vue" | ".js" | ".rust" | ".java";
+export type SupportedLanguage =
+	| ".ts"
+	| ".kt"
+	| ".go"
+	| ".vue"
+	| ".js"
+	| ".rust"
+	| ".java";
 
 interface TemplateOptions {
 	tmpl: string;
@@ -152,7 +165,7 @@ export default async function copyTemplate(
 		await execCommand(
 			"git init",
 			"Initializing git repository...",
-			projectName
+			projectName,
 		);
 		log(chalk.green(TEXT.CLONE_PROJECT.SUCCESS(projectName)));
 	} catch (error) {

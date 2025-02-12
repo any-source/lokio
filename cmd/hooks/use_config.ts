@@ -54,19 +54,12 @@ export const useReadConfig = (): UseReadConfigType => {
 		data: {
 			name: parsedYaml.name || null,
 			package: parsedYaml.package || null,
-			dir: {
-				hook: parsedYaml.dir?.hook || null,
-				shared: parsedYaml.dir?.shared || null,
-				call: parsedYaml.dir?.call || null,
-				component: parsedYaml.dir?.component || null,
-				screen: parsedYaml.dir?.screen || null,
-				layout: parsedYaml.dir?.layout || null,
-				feature: parsedYaml.dir?.feature || null,
-				controller: parsedYaml.dir?.controller || null,
-				middleware: parsedYaml.dir?.middleware || null,
-				service: parsedYaml.dir?.service || null,
-				schema: parsedYaml.dir?.schema || null,
-			},
+			dir: Object.fromEntries(
+				Object.entries(parsedYaml.dir || {}).map(([key, value]) => [
+					key,
+					value || null,
+				]),
+			),
 		},
 	};
 };

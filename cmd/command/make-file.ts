@@ -4,10 +4,10 @@ import chalk from "chalk";
 import ejs from "ejs";
 
 import { CONTEXT_KEY } from "@/configs/context-key";
+import { fileFormat, fileName, folderStructure } from "@/configs/make-config";
 import { getContext } from "@/context/main";
 import { readFileFromGithub } from "@/hooks/use_github";
 import { log } from "@/utils/util-use";
-import { fileFormat, fileName, folderStructure } from "@/configs/make-config";
 
 interface MakeFileProps {
 	file_output_create: string | Array<{ [key: string]: string }>;
@@ -63,7 +63,7 @@ const MakeFile = async ({
 			const createdFiles = await Promise.all(
 				file_output_create.map(async (config) => {
 					const [key, outputPath] = Object.entries(config)[0];
-					const file_name = await fileName(key);					
+					const file_name = await fileName(key);
 					return createSingleFile({
 						outputPath,
 						named,
@@ -72,7 +72,7 @@ const MakeFile = async ({
 						file_format: await fileFormat(key),
 						renderedContent,
 					});
-				})
+				}),
 			);
 
 			return createdFiles;
@@ -118,17 +118,13 @@ const createSingleFile = async ({
 		file_folder_structure,
 		named,
 	);
-	const fullOutputPath = path.join(
-		outputPath,
-		resolvedfileFolderStructure,
-	);
+	const fullOutputPath = path.join(outputPath, resolvedfileFolderStructure);
 
 	// 2. Create directory
 	fs.mkdirSync(fullOutputPath, { recursive: true });
 
 	// 3. Resolve and create file
-	const resolvedfile_name =
-		replacePlaceholders(file_name, named) + file_format;
+	const resolvedfile_name = replacePlaceholders(file_name, named) + file_format;
 	const finalFilePath = path.join(fullOutputPath, resolvedfile_name);
 
 	// 4. Write file

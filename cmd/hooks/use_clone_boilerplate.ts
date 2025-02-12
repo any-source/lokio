@@ -72,7 +72,7 @@ async function processLanguageSpecific(
 			await processFilesGolang(projectDir, projectName);
 			if (install) await installDependenciesGolang(projectDir);
 		},
-		kt: async () => {},
+		kt: async () => { },
 	};
 
 	await handlers[ejst.slice(1) as keyof typeof handlers]();

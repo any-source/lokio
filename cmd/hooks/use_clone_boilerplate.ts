@@ -15,8 +15,10 @@ import {
 import { log } from "@/utils/util-use";
 import chalk from "chalk";
 import simpleGit from "simple-git";
+import { processFilesKotlin } from "@/services/install/kotlin";
+import { processFilesDart } from "@/services/install/dart";
 
-export type SupportedLanguage = ".ts" | ".kt" | ".go" | ".vue" | ".js";
+export type SupportedLanguage = ".ts" | ".kt" | ".go" | ".vue" | ".js" | ".dart";
 
 interface TemplateOptions {
 	tmpl: string;
@@ -64,7 +66,15 @@ async function processLanguageSpecific(
 	install: boolean,
 ): Promise<void> {
 	const handlers = {
+		js: async () => {
+			await processFilesTypescript(projectDir, projectName);
+			if (install) await installDependenciesTypescript(projectDir);
+		},
 		ts: async () => {
+			await processFilesTypescript(projectDir, projectName);
+			if (install) await installDependenciesTypescript(projectDir);
+		},
+		vue: async () => {
 			await processFilesTypescript(projectDir, projectName);
 			if (install) await installDependenciesTypescript(projectDir);
 		},
@@ -72,7 +82,12 @@ async function processLanguageSpecific(
 			await processFilesGolang(projectDir, projectName);
 			if (install) await installDependenciesGolang(projectDir);
 		},
-		kt: async () => { },
+		kt: async () => {
+			await processFilesKotlin(projectDir, projectName);
+		},
+		dart: async () => {
+			await processFilesDart(projectDir, projectName);
+		},
 	};
 
 	await handlers[ejst.slice(1) as keyof typeof handlers]();

@@ -45,15 +45,15 @@ export const ProgramMake = async (program: Command) => {
 					if (!value) {
 						return "Project name is required";
 					}
-		
+
 					if (/\s/.test(value)) {
 						return "Project name cannot contain spaces";
 					}
-					
+
 					if (value.length > 30) {
 						return "Project name cannot exceed 30 characters";
 					}
-		
+
 					return undefined;
 				},
 			})) as string;

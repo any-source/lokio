@@ -16,7 +16,9 @@ import { log } from "@/utils/util-use";
 import chalk from "chalk";
 import simpleGit from "simple-git";
 import { processFilesKotlin } from "@/services/install/kotlin";
-import { processFilesDart } from "@/services/install/dart";
+import { installDependenciesDart, processFilesDart } from "@/services/install/dart";
+import { execCommand } from "@/services/exect-command";
+import { installDependenciesRust, processFilesRust } from "@/services/install/rust";
 
 export type SupportedLanguage = ".ts" | ".kt" | ".go" | ".vue" | ".js" | ".rust" | ".java";
 
@@ -89,10 +91,12 @@ async function processLanguageSpecific(
 			await processFilesKotlin(projectDir, projectName);
 		},
 		dart: async () => {
+			if (install) await installDependenciesDart(projectDir);
 			await processFilesDart(projectDir, projectName);
 		},
 		rust: async () => {
-			await processFilesDart(projectDir, projectName);
+			if (install) await installDependenciesRust(projectDir);
+			await processFilesRust(projectDir, projectName);
 		},
 	};
 
@@ -145,6 +149,11 @@ export default async function copyTemplate(
 		// Process language-specific files
 		await processLanguageSpecific(ejst, projectName, projectName, install);
 
+		await execCommand(
+			"git init",
+			"Initializing git repository...",
+			projectName
+		);
 		log(chalk.green(TEXT.CLONE_PROJECT.SUCCESS(projectName)));
 	} catch (error) {
 		log(chalk.red(TEXT.CLONE_PROJECT.FAILURE));

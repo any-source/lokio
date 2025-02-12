@@ -57,9 +57,9 @@ export const useReadConfig = (): UseReadConfigType => {
 			dir: Object.fromEntries(
 				Object.entries(parsedYaml.dir || {}).map(([key, value]) => [
 					key,
-					value || null
-				])
-			)
+					value || null,
+				]),
+			),
 		},
 	};
 };

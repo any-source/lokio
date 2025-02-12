@@ -1,5 +1,9 @@
 import { execCommand } from "../exect-command";
-import { removeFiles, updateFiles } from "../update-remove-files";
+import {
+	removeFiles,
+	renameFolders,
+	updateFiles,
+} from "../update-remove-files";
 
 export const installDependenciesRust = async (
 	projectDir: string,
@@ -23,6 +27,7 @@ export const processFilesRust = async (
 	try {
 		await removeFiles(projectDir);
 		await updateFiles(projectDir, projectName);
+		await renameFolders(projectDir, projectName);
 	} catch (error) {
 		throw new Error(
 			`Failed to process Rust project files: ${(error as Error).message}`,

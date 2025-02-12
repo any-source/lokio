@@ -14,9 +14,15 @@ interface FileConfig {
 	patterns: Pattern[];
 }
 
+interface FolderRename {
+	from: string;
+	to: string;
+}
+
 interface Config {
 	files_remove?: string[];
 	files_replace_package?: Record<string, FileConfig>;
+	folder_rename?: FolderRename[];
 }
 
 const getPackageConfig = async (): Promise<Config> => {
@@ -43,6 +49,57 @@ const validatePattern = (pattern: unknown): pattern is Pattern => {
 	}
 
 	return true;
+};
+
+export const renameFolders = async (
+	projectDir: string,
+	projectName: string,
+): Promise<void> => {
+	try {
+		const config = await getPackageConfig();
+		const folderRenames = config?.folder_rename;
+
+		if (!Array.isArray(folderRenames)) {
+			return;
+		}
+
+		for (const rename of folderRenames) {
+			if (!(rename.from?.trim() && rename.to?.trim())) {
+				throw new Error(
+					'Invalid folder rename configuration: missing "from" or "to" path',
+				);
+			}
+
+			const fromPath = path.resolve(projectDir, rename.from);
+			const toPath = path.resolve(
+				projectDir,
+				rename.to.replace(/\${name}/g, projectName),
+			);
+
+			try {
+				// Check if source folder exists
+				await fs.access(fromPath);
+
+				// Create parent directory of destination if it doesn't exist
+				await fs.mkdir(path.dirname(toPath), { recursive: true });
+
+				// Perform the rename
+				await fs.rename(fromPath, toPath);
+				// log(`Successfully renamed folder: ${rename.from} -> ${rename.to}`);
+			} catch (error) {
+				if ((error as NodeJS.ErrnoException).code === "ENOENT") {
+					console.warn(`Source folder not found: ${fromPath}`);
+				} else {
+					throw new Error(
+						`Failed to rename folder ${rename.from}: ${(error as Error).message}`,
+					);
+				}
+			}
+		}
+	} catch (error) {
+		console.error("Error in renameFolders:", error);
+		throw error;
+	}
 };
 
 export const updateFiles = async (

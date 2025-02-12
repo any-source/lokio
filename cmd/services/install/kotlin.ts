@@ -1,4 +1,8 @@
-import { removeFiles, updateFiles } from "../update-remove-files";
+import {
+	removeFiles,
+	renameFolders,
+	updateFiles,
+} from "../update-remove-files";
 
 export const processFilesKotlin = async (
 	projectDir: string,
@@ -7,6 +11,7 @@ export const processFilesKotlin = async (
 	try {
 		await removeFiles(projectDir);
 		await updateFiles(projectDir, projectName);
+		await renameFolders(projectDir, projectName);
 	} catch (error) {
 		throw new Error(
 			`Failed to process KT project files: ${(error as Error).message}`,

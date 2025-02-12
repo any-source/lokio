@@ -1,7 +1,11 @@
 import { log } from "@/utils/util-use";
 import { select } from "@clack/prompts";
 import { execCommand } from "../exect-command";
-import { removeFiles, renameFolders, updateFiles } from "../update-remove-files";
+import {
+	removeFiles,
+	renameFolders,
+	updateFiles,
+} from "../update-remove-files";
 
 export const installDependenciesTypescript = async (
 	projectDir: string,

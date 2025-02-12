@@ -1,4 +1,8 @@
-import { removeFiles, renameFolders, updateFiles } from "../update-remove-files";
+import {
+	removeFiles,
+	renameFolders,
+	updateFiles,
+} from "../update-remove-files";
 
 export const processFilesKotlin = async (
 	projectDir: string,

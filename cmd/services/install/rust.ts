@@ -1,5 +1,9 @@
 import { execCommand } from "../exect-command";
-import { removeFiles, renameFolders, updateFiles } from "../update-remove-files";
+import {
+	removeFiles,
+	renameFolders,
+	updateFiles,
+} from "../update-remove-files";
 
 export const installDependenciesRust = async (
 	projectDir: string,

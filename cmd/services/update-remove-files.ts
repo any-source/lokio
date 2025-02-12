@@ -53,7 +53,7 @@ const validatePattern = (pattern: unknown): pattern is Pattern => {
 
 export const renameFolders = async (
 	projectDir: string,
-	projectName: string
+	projectName: string,
 ): Promise<void> => {
 	try {
 		const config = await getPackageConfig();
@@ -65,13 +65,15 @@ export const renameFolders = async (
 
 		for (const rename of folderRenames) {
 			if (!(rename.from?.trim() && rename.to?.trim())) {
-				throw new Error('Invalid folder rename configuration: missing "from" or "to" path');
+				throw new Error(
+					'Invalid folder rename configuration: missing "from" or "to" path',
+				);
 			}
 
 			const fromPath = path.resolve(projectDir, rename.from);
 			const toPath = path.resolve(
 				projectDir,
-				rename.to.replace(/\${name}/g, projectName)
+				rename.to.replace(/\${name}/g, projectName),
 			);
 
 			try {
@@ -85,11 +87,11 @@ export const renameFolders = async (
 				await fs.rename(fromPath, toPath);
 				// log(`Successfully renamed folder: ${rename.from} -> ${rename.to}`);
 			} catch (error) {
-				if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+				if ((error as NodeJS.ErrnoException).code === "ENOENT") {
 					console.warn(`Source folder not found: ${fromPath}`);
 				} else {
 					throw new Error(
-						`Failed to rename folder ${rename.from}: ${(error as Error).message}`
+						`Failed to rename folder ${rename.from}: ${(error as Error).message}`,
 					);
 				}
 			}

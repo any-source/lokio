@@ -11,7 +11,8 @@ export const installDependenciesTypescript = async (projectDir: string): Promise
 			options: [
 				{
 					label: "bun",
-					value: "bun install"
+					value: "bun install",
+					hint: "Recomended"
 				},
 				{
 					label: "yarn",

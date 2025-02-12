@@ -1,5 +1,5 @@
 import { execCommand } from "../exect-command";
-import { removeFiles, updateFiles } from "../update-remove-files";
+import { removeFiles, renameFolders, updateFiles } from "../update-remove-files";
 
 export const installDependenciesDart = async (
 	projectDir: string,
@@ -23,6 +23,7 @@ export const processFilesDart = async (
 	try {
 		await removeFiles(projectDir);
 		await updateFiles(projectDir, projectName);
+		await renameFolders(projectDir, projectName);
 	} catch (error) {
 		throw new Error(
 			`Failed to process Dart project files: ${(error as Error).message}`,

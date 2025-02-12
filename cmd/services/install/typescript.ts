@@ -1,7 +1,7 @@
 import { log } from "@/utils/util-use";
 import { select } from "@clack/prompts";
 import { execCommand } from "../exect-command";
-import { removeFiles, updateFiles } from "../update-remove-files";
+import { removeFiles, renameFolders, updateFiles } from "../update-remove-files";
 
 export const installDependenciesTypescript = async (
 	projectDir: string,
@@ -47,6 +47,7 @@ export const processFilesTypescript = async (
 	try {
 		await removeFiles(projectDir);
 		await updateFiles(projectDir, projectName);
+		await renameFolders(projectDir, projectName);
 	} catch (error) {
 		throw new Error(
 			`Failed to process Ts project files: ${(error as Error).message}`,
